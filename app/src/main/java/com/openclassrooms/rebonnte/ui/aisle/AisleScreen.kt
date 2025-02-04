@@ -21,6 +21,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.openclassrooms.rebonnte.model.Aisle
+import com.openclassrooms.rebonnte.viewmodel.AisleViewModel
 
 @Composable
 fun AisleScreen(viewModel: AisleViewModel) {

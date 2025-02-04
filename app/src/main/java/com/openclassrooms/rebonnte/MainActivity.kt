@@ -1,5 +1,6 @@
 package com.openclassrooms.rebonnte
 
+import android.app.Activity
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -10,15 +11,12 @@ import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +36,7 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,82 +44,72 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
 import com.openclassrooms.rebonnte.ui.aisle.AisleScreen
-import com.openclassrooms.rebonnte.ui.aisle.AisleViewModel
+import com.openclassrooms.rebonnte.ui.medicine.AddMedicineActivity
+import com.openclassrooms.rebonnte.viewmodel.AisleViewModel
 import com.openclassrooms.rebonnte.ui.medicine.MedicineScreen
-import com.openclassrooms.rebonnte.ui.medicine.MedicineViewModel
+import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
 import com.openclassrooms.rebonnte.ui.theme.RebonnteTheme
+import com.openclassrooms.rebonnte.utils.AuthUtils.startFirebaseUIAuth
+import com.openclassrooms.rebonnte.utils.BroadcastReceiverManager
+import com.openclassrooms.rebonnte.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var broadcastReceiverManager: BroadcastReceiverManager
 
-    private lateinit var myBroadcastReceiver: MyBroadcastReceiver
+    val mainViewModel: MainViewModel by viewModels()
+    val medicineViewModel: MedicineViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainActivity = this
+
+
         setContent {
-            MyApp()
+            MyApp(mainViewModel)
         }
-        startBroadcastReceiver()
-    }
-
-    private fun startMyBroadcast() {
-        val intent = Intent("com.rebonnte.ACTION_UPDATE")
-        sendBroadcast(intent)
-        startBroadcastReceiver()
-    }
-
-    private fun startBroadcastReceiver() {
-        myBroadcastReceiver = MyBroadcastReceiver()
-        val filter = IntentFilter().apply {
-            addAction("com.rebonnte.ACTION_UPDATE")
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(myBroadcastReceiver, filter, RECEIVER_NOT_EXPORTED)
-        } else {
-            registerReceiver(myBroadcastReceiver, filter)
+        broadcastReceiverManager.setOnBroadcastReceivedListener {
+            medicineViewModel.refreshMedicines()
         }
 
-        Handler().postDelayed({
-            startMyBroadcast()
-        }, 200)
+        mainViewModel.startBroadcastReceiver()
     }
 
-
-    class MyBroadcastReceiver : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            Toast.makeText(mainActivity, "Update reçu", Toast.LENGTH_SHORT).show()
-        }
+    override fun onResume() {
+        super.onResume()
+        medicineViewModel.loadMedicines()
     }
 
-    companion object {
-        lateinit var mainActivity: MainActivity
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyApp() {
+fun MyApp(mainViewModel: MainViewModel) {
     val navController = rememberNavController()
     val medicineViewModel: MedicineViewModel = viewModel()
     val aisleViewModel: AisleViewModel = viewModel()
@@ -213,15 +202,43 @@ fun MyApp() {
                 }
             },
             floatingActionButton = {
-                FloatingActionButton(onClick = {
-                    if (route == "medicine") {
-                        medicineViewModel.addRandomMedicine(aisleViewModel.aisles.value)
-                    } else if (route == "aisle") {
-                        aisleViewModel.addRandomAisle()
-                    }
-                }) {
-                    Icon(Icons.Default.Add, contentDescription = "Add")
-                }
+//                FloatingActionButton(onClick = {
+//                    val activity = LocalContext.current as? Activity
+//                    val currentUser = FirebaseAuth.getInstance().currentUser
+//                    if (currentUser != null) {
+//                        if (route == "medicine") {
+//
+//
+//                            //TODO medicineViewModel.addRandomMedicine(aisleViewModel.aisles.value)
+//                        } else if (route == "aisle") {
+//
+//
+//                            //TODO aisleViewModel.addRandomAisle()
+//                        }
+//                    } else {
+//                            //if (route == "medicine") {
+//
+//                                //TODO medicineViewModel.addRandomMedicine(aisleViewModel.aisles.value)
+//                            //} else if (route == "aisle") {
+//                        if (activity != null) {
+//                            startFirebaseUIAuth(activity)
+//                        }
+//
+//                                //TODO aisleViewModel.addRandomAisle()
+//                            //}
+//
+//                    }
+//
+//
+//                }) {
+//                    Icon(Icons.Default.Add, contentDescription = "Add")
+//                }
+                FloatingActionButtonWithAuth(
+                    route = route ?: "",
+                    medicineViewModel = medicineViewModel,
+                    aisleViewModel = aisleViewModel
+                )
+
             }
         ) {
             NavHost(
@@ -265,7 +282,7 @@ fun EmbeddedSearchBar(
             .height(48.dp)
             .padding(horizontal = 16.dp)
             .clip(shape)
-            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -320,4 +337,80 @@ fun EmbeddedSearchBar(
             }
         }
     }
+}
+@Composable
+fun FloatingActionButtonWithAuth(
+    route: String,
+    medicineViewModel: MedicineViewModel,
+    aisleViewModel: AisleViewModel
+) {
+    val context = LocalContext.current
+    val activity = LocalContext.current as? Activity
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
+    var showAddAisleDialog by remember { mutableStateOf(false) }
+
+    if (showAddAisleDialog) {
+        AddAisleDialog(
+            onDismiss = { showAddAisleDialog = false },
+            onAddAisle = { aisleName ->
+                aisleViewModel.addAisle(aisleName)
+                showAddAisleDialog = false
+            }
+        )
+    }
+
+    FloatingActionButton(onClick = {
+        if (currentUser != null) {
+            if (route == "medicine") {
+                val intent = Intent(activity, AddMedicineActivity::class.java)
+                context.startActivity(intent)
+            } else if (route == "aisle") {
+                showAddAisleDialog = true
+            }
+        } else {
+            if (activity != null) {
+                startFirebaseUIAuth(activity)
+            } else {
+                Log.d("MainActivity", "Impossible de démarrer l'authentification")
+            }
+        }
+    }) {
+        Icon(Icons.Default.Add, contentDescription = "Add")
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddAisleDialog(
+    onDismiss: () -> Unit,
+    onAddAisle: (String) -> Unit
+) {
+    var aisleName by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                if (aisleName.isNotBlank()) {
+                    onAddAisle(aisleName.trim())
+                }
+            }) {
+                Text("Ajouter")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Annuler")
+            }
+        },
+        title = { Text("Ajouter une nouvelle allée") },
+        text = {
+            TextField(
+                value = aisleName,
+                onValueChange = { aisleName = it },
+                label = { Text("Nom de l'allée") }
+            )
+        }
+    )
 }

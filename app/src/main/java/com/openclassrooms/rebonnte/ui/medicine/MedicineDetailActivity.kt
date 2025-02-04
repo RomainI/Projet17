@@ -1,8 +1,10 @@
 package com.openclassrooms.rebonnte.ui.medicine
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +19,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,19 +34,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.auth.FirebaseAuth
 import com.openclassrooms.rebonnte.MainActivity
-import com.openclassrooms.rebonnte.ui.history.History
+import com.openclassrooms.rebonnte.model.History
 import com.openclassrooms.rebonnte.ui.theme.RebonnteTheme
+import com.openclassrooms.rebonnte.utils.AuthUtils.startFirebaseUIAuth
+import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
 
+@AndroidEntryPoint
 class MedicineDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val name = intent.getStringExtra("nameMedicine") ?: "Unknown"
-        val viewModel = ViewModelProvider(MainActivity.mainActivity)[MedicineViewModel::class.java]
+        val viewModel: MedicineViewModel by viewModels()
 
         setContent {
             RebonnteTheme {
@@ -53,11 +62,12 @@ class MedicineDetailActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MedicineDetailScreen(name: String, viewModel: MedicineViewModel) {
     val medicines by viewModel.medicines.collectAsState(initial = emptyList())
     val medicine = medicines.find { it.name == name } ?: return
-    var stock by remember { mutableStateOf(medicine.stock) }
+    val stock = medicine.stock
 
     Scaffold { paddingValues ->
         Column(
@@ -85,17 +95,27 @@ fun MedicineDetailScreen(name: String, viewModel: MedicineViewModel) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                val currentUser = FirebaseAuth.getInstance().currentUser
+                val activity = LocalContext.current as? Activity
                 IconButton(onClick = {
-                    if (stock > 0) {
-                        medicines[medicines.size].histories.toMutableList().add(
-                            History(
-                                medicine.name,
-                                "efeza56f1e65f",
-                                Date().toString(),
-                                "Updated medicine details"
-                            )
-                        )
-                        stock--
+                    if (currentUser !=null) {
+//                        if (stock > 0) {
+//                            medicines[medicines.size].histories.toMutableList().add(
+//                                History(
+//                                    medicine.name,
+//                                    currentUser.email,
+//                                    Date(),
+//                                    "Updated medicine details"
+//                                )
+//                            )
+//                            stock--
+//                        }
+
+                        viewModel.decrementStock(medicine, currentUser.email)
+                    } else {
+                        if (activity != null) {
+                            startFirebaseUIAuth(activity)
+                        }
                     }
                 }) {
                     Icon(
@@ -111,15 +131,23 @@ fun MedicineDetailScreen(name: String, viewModel: MedicineViewModel) {
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(onClick = {
-                    medicines[medicines.size].histories.toMutableList().add(
-                        History(
-                            medicine.name,
-                            "efeza56f1e65f",
-                            Date().toString(),
-                            "Updated medicine details"
-                        )
-                    )
-                    stock++
+                    if (currentUser !=null) {
+//                        medicines[medicines.size].histories.toMutableList().add(
+//                            History(
+//                                medicine.name,
+//                                currentUser.email,
+//                                Date(),
+//                                "Updated medicine details"
+//                            )
+//                        )
+//                        stock++
+                        viewModel.incrementStock(medicine, currentUser.email)
+
+                    } else {
+                        if (activity != null) {
+                            startFirebaseUIAuth(activity)
+                        }
+                    }
                 }) {
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowUp,
@@ -149,7 +177,7 @@ fun HistoryItem(history: History) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = history.medicineName, fontWeight = FontWeight.Bold)
-            Text(text = "User: ${history.userId}")
+            Text(text = "User: ${history.userEmail}")
             Text(text = "Date: ${history.date}")
             Text(text = "Details: ${history.details}")
         }
