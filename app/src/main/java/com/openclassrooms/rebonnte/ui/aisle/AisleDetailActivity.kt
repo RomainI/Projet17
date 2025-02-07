@@ -1,5 +1,6 @@
 package com.openclassrooms.rebonnte.ui.aisle
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,11 +16,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -57,8 +61,25 @@ fun AisleDetailScreen(name: String, viewModel: MedicineViewModel) {
     val medicines by viewModel.medicines.collectAsState(initial = emptyList())
     val filteredMedicines = medicines.filter { it.nameAisle == name }
     val context = LocalContext.current
-
-    Scaffold { paddingValues ->
+    val activity = context as Activity
+    Scaffold(topBar = {
+        TopAppBar(
+            title = {
+                Text(text = "Aisle detail")
+            },
+            navigationIcon = {
+                IconButton(onClick = {
+                    activity?.finish()
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "go back",
+                        tint = Color.Black
+                    )
+                }
+            }
+        )
+    }){ paddingValues ->
         LazyColumn(
             contentPadding = paddingValues,
             modifier = Modifier.fillMaxSize()

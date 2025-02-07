@@ -20,6 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.platform.LocalContext
 import com.openclassrooms.rebonnte.model.Medicine
 import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun MedicineScreen(viewModel: MedicineViewModel = viewModel()) {
@@ -32,26 +33,44 @@ fun MedicineScreen(viewModel: MedicineViewModel = viewModel()) {
         items(medicines) { medicine ->
             MedicineItem(medicine = medicine, onClick = {
                 startDetailActivity(context, medicine.name)
-            })
+            }, medicineViewModel = viewModel)
         }
     }
 }
-
 @Composable
-fun MedicineItem(medicine: Medicine, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column {
-            Text(text = medicine.name, style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Stock: ${medicine.stock}", style = MaterialTheme.typography.bodyMedium)
+fun MedicineItem(
+    medicine: Medicine,
+    onClick: () -> Unit,
+    medicineViewModel: MedicineViewModel
+) {
+    SwipeToDeleteItem(
+        onDelete = { medicineViewModel.deleteMedicine(medicine.id) },
+        resetState = false,
+        content = { modifier ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onClick() }
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = medicine.name,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Text(
+                        text = "Stock: ${medicine.stock}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowRight,
+                    contentDescription = "Arrow"
+                )
+            }
         }
-        Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = "Arrow")
-    }
+    )
 }
 
 private fun startDetailActivity(context: Context, name: String) {

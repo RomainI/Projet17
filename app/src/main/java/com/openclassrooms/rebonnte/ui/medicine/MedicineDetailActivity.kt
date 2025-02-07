@@ -1,6 +1,7 @@
 package com.openclassrooms.rebonnte.ui.medicine
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
@@ -26,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,10 +37,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.openclassrooms.rebonnte.MainActivity
 import com.openclassrooms.rebonnte.model.History
@@ -64,12 +70,38 @@ class MedicineDetailActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MedicineDetailScreen(name: String, viewModel: MedicineViewModel) {
+fun MedicineDetailScreen(
+    name: String, viewModel: MedicineViewModel
+) {
     val medicines by viewModel.medicines.collectAsState(initial = emptyList())
     val medicine = medicines.find { it.name == name } ?: return
     val stock = medicine.stock
+    val context = LocalContext.current
+    val activity = context as Activity
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = "Medicine detail")
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+//                        val intent = Intent(activity, MainActivity::class.java)
+//                        context.startActivity(intent)
+                        activity?.finish()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "go back",
+                            tint = Color.Black
+                        )
+                    }
+                }
+            )
+        }
+    )
 
-    Scaffold { paddingValues ->
+    { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -98,7 +130,7 @@ fun MedicineDetailScreen(name: String, viewModel: MedicineViewModel) {
                 val currentUser = FirebaseAuth.getInstance().currentUser
                 val activity = LocalContext.current as? Activity
                 IconButton(onClick = {
-                    if (currentUser !=null) {
+                    if (currentUser != null) {
 //                        if (stock > 0) {
 //                            medicines[medicines.size].histories.toMutableList().add(
 //                                History(
@@ -131,7 +163,7 @@ fun MedicineDetailScreen(name: String, viewModel: MedicineViewModel) {
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(onClick = {
-                    if (currentUser !=null) {
+                    if (currentUser != null) {
 //                        medicines[medicines.size].histories.toMutableList().add(
 //                            History(
 //                                medicine.name,
