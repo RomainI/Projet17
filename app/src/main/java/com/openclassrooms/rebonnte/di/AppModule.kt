@@ -1,7 +1,9 @@
 package com.openclassrooms.rebonnte.di
 
 import android.content.Context
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.openclassrooms.rebonnte.repository.AuthRepository
 import com.openclassrooms.rebonnte.repository.MedicineRepository
 import com.openclassrooms.rebonnte.utils.BroadcastReceiverManager
 import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
@@ -31,5 +33,11 @@ object AppModule {
     @Provides
     fun provideBroadcastReceiverManager(@ApplicationContext context: Context): BroadcastReceiverManager {
         return BroadcastReceiverManager(context)
+    }
+
+
+    @Provides
+    fun provideAuthRepository(): AuthRepository {
+        return AuthRepository(FirebaseAuth.getInstance())
     }
 }

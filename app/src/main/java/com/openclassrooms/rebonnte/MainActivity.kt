@@ -66,6 +66,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.openclassrooms.rebonnte.ui.aisle.AisleScreen
+import com.openclassrooms.rebonnte.ui.manageaccount.ManageAccountScreen
 import com.openclassrooms.rebonnte.ui.medicine.AddMedicineActivity
 import com.openclassrooms.rebonnte.viewmodel.AisleViewModel
 import com.openclassrooms.rebonnte.ui.medicine.MedicineScreen
@@ -75,6 +76,7 @@ import com.openclassrooms.rebonnte.utils.AuthUtils.startFirebaseUIAuth
 import com.openclassrooms.rebonnte.utils.BroadcastReceiverManager
 import com.openclassrooms.rebonnte.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -116,6 +118,7 @@ fun MyApp(mainViewModel: MainViewModel) {
     val aisleViewModel: AisleViewModel = viewModel()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val route = navBackStackEntry?.destination?.route
+    val coroutine= rememberCoroutineScope()
 
     RebonnteTheme {
         Scaffold(
@@ -124,65 +127,75 @@ fun MyApp(mainViewModel: MainViewModel) {
                 var searchQuery by remember { mutableStateOf("") }
 
                 Column(verticalArrangement = Arrangement.spacedBy((-1).dp)) {
-                    TopAppBar(
-                        title = { if (route == "aisle") Text(text = "Aisle") else Text(text = "Medicines") },
-                        actions = {
-                            var expanded by remember { mutableStateOf(false) }
-                            if (currentRoute(navController) == "medicine") {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .padding(end = 8.dp)
-                                        .background(MaterialTheme.colorScheme.surface)
-                                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                                ) {
-                                    Box {
-                                        IconButton(onClick = { expanded = true }) {
-                                            Icon(Icons.Default.MoreVert, contentDescription = null)
-                                        }
-                                        DropdownMenu(
-                                            expanded = expanded,
-                                            onDismissRequest = { expanded = false },
-                                            offset = DpOffset(x = 0.dp, y = 0.dp)
-                                        ) {
-                                            DropdownMenuItem(
-                                                onClick = {
-                                                    medicineViewModel.sortByNone()
-                                                    expanded = false
-                                                },
-                                                text = { Text("Sort by None") }
-                                            )
-                                            DropdownMenuItem(
-                                                onClick = {
-                                                    medicineViewModel.sortByName()
-                                                    expanded = false
-                                                },
-                                                text = { Text("Sort by Name") }
-                                            )
-                                            DropdownMenuItem(
-                                                onClick = {
-                                                    medicineViewModel.sortByStock()
-                                                    expanded = false
-                                                },
-                                                text = { Text("Sort by Stock") }
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    )
-                    if (currentRoute(navController) == "medicine") {
-                        EmbeddedSearchBar(
-                            query = searchQuery,
-                            onQueryChange = {
-                                medicineViewModel.filterByName(it)
-                                searchQuery = it
-                            },
-                            isSearchActive = isSearchActive,
-                            onActiveChanged = { isSearchActive = it }
-                        )
+//                    TopAppBar(
+//                        title = { if (route == "aisle") Text(text = "Aisle") else Text(text = "Medicines") },
+//                        actions = {
+//                            var expanded by remember { mutableStateOf(false) }
+//                            // if (currentRoute(navController) == "medicine") {
+//                            Row(
+//                                verticalAlignment = Alignment.CenterVertically,
+//                                modifier = Modifier
+//                                    .padding(end = 8.dp)
+//                                    .background(MaterialTheme.colorScheme.surface)
+//                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+//                            ) {
+//                                Box {
+//                                    IconButton(onClick = { expanded = true }) {
+//                                        Icon(Icons.Default.MoreVert, contentDescription = null)
+//                                    }
+//                                    DropdownMenu(
+//                                        expanded = expanded,
+//                                        onDismissRequest = { expanded = false },
+//                                        offset = DpOffset(x = 0.dp, y = 0.dp)
+//                                    ) {
+////                                        DropdownMenuItem(
+////                                            onClick = {
+//                                        //TODO
+////                                                medicineViewModel.sortByNone()
+////                                                expanded = false
+////                                            },
+////                                            text = { Text("Sort by None") }
+////                                        )
+//                                        DropdownMenuItem(
+//                                            onClick = {
+//                                                coroutine.launch {
+//                                                    medicineViewModel.sortByName()
+//                                                }
+//                                                expanded = false
+//                                            },
+//                                            text = { Text("Sort by Name") }
+//                                        )
+//                                        DropdownMenuItem(
+//                                            onClick = {
+//                                                medicineViewModel.sortByStock()
+//                                                expanded = false
+//                                            },
+//                                            text = { Text("Sort by Stock") }
+//                                        )
+//                                    }
+//                                }
+//                            }
+//                            //}
+//                        }
+//                    )
+//                    if (currentRoute(navController) == "medicine") {
+//                        EmbeddedSearchBar(
+//                            query = searchQuery,
+//                            onQueryChange = {
+//                                coroutine.launch {
+//                                    medicineViewModel.filterByName(it)
+//                                }
+//                                searchQuery = it
+//                            },
+//                            isSearchActive = isSearchActive,
+//                            onActiveChanged = { isSearchActive = it }
+//                        )
+//                    }
+                    if (route != null) {
+                        TitleBar(route, medicineViewModel, aisleViewModel, navController)
                     }
+
+
                 }
 
             },
@@ -203,37 +216,6 @@ fun MyApp(mainViewModel: MainViewModel) {
                 }
             },
             floatingActionButton = {
-//                FloatingActionButton(onClick = {
-//                    val activity = LocalContext.current as? Activity
-//                    val currentUser = FirebaseAuth.getInstance().currentUser
-//                    if (currentUser != null) {
-//                        if (route == "medicine") {
-//
-//
-//                            //TODO medicineViewModel.addRandomMedicine(aisleViewModel.aisles.value)
-//                        } else if (route == "aisle") {
-//
-//
-//                            //TODO aisleViewModel.addRandomAisle()
-//                        }
-//                    } else {
-//                            //if (route == "medicine") {
-//
-//                                //TODO medicineViewModel.addRandomMedicine(aisleViewModel.aisles.value)
-//                            //} else if (route == "aisle") {
-//                        if (activity != null) {
-//                            startFirebaseUIAuth(activity)
-//                        }
-//
-//                                //TODO aisleViewModel.addRandomAisle()
-//                            //}
-//
-//                    }
-//
-//
-//                }) {
-//                    Icon(Icons.Default.Add, contentDescription = "Add")
-//                }
                 FloatingActionButtonWithAuth(
                     route = route ?: "",
                     medicineViewModel = medicineViewModel,
@@ -249,7 +231,107 @@ fun MyApp(mainViewModel: MainViewModel) {
             ) {
                 composable("aisle") { AisleScreen(aisleViewModel) }
                 composable("medicine") { MedicineScreen(medicineViewModel) }
+                composable("manage_account") { ManageAccountScreen() }
+
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TitleBar(route: String, medicineViewModel: MedicineViewModel, aisleViewModel: AisleViewModel, navController: NavController) {
+    var isSearchActive by rememberSaveable { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+    val coroutine = rememberCoroutineScope()
+    val activity = LocalContext.current as? Activity
+    Column(verticalArrangement = Arrangement.spacedBy((-1).dp)) {
+        TopAppBar(
+            title = { if (route == "aisle") Text(text = "Aisle") else Text(text = "Medicines") },
+            actions = {
+                var expanded by remember { mutableStateOf(false) }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Box {
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = null)
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                            offset = DpOffset(x = 0.dp, y = 0.dp)
+                        ) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    if(FirebaseAuth.getInstance().currentUser!=null){
+                                        navController.navigate("manage_account")
+                                    } else {
+                                        if (activity != null) {
+                                            startFirebaseUIAuth(activity)
+                                        }
+                                    }
+                                    expanded = false
+                                },
+                                text = {
+                                    if(FirebaseAuth.getInstance().currentUser!=null){
+                                        Text("Manage account")
+                                    } else {
+                                        Text("Log in")
+                                    }
+
+                                }
+                            )
+                            DropdownMenuItem(
+                                onClick = {
+                                    coroutine.launch {
+                                        medicineViewModel.sortByName()
+                                    }
+                                    expanded = false
+                                },
+                                text = { Text("Sort by Name") }
+                            )
+                            DropdownMenuItem(
+                                onClick = {
+                                    medicineViewModel.sortByStock()
+                                    expanded = false
+                                },
+                                text = { Text("Sort by Stock") }
+                            )
+                        }
+                    }
+                }
+                //}
+            }
+        )
+        if (route == "medicine") {
+            EmbeddedSearchBar(
+                query = searchQuery,
+                onQueryChange = {
+                    coroutine.launch {
+                        medicineViewModel.filterByName(it)
+                    }
+                    searchQuery = it
+                },
+                isSearchActive = isSearchActive,
+                onActiveChanged = { isSearchActive = it }
+            )
+        } else {
+            EmbeddedSearchBar(
+                query = searchQuery,
+                onQueryChange = {
+                    coroutine.launch {
+                        aisleViewModel.filterByName(it)
+                    }
+                    searchQuery = it
+                },
+                isSearchActive = isSearchActive,
+                onActiveChanged = { isSearchActive = it }
+            )
         }
     }
 }
@@ -268,6 +350,7 @@ fun EmbeddedSearchBar(
     onActiveChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
     var searchQuery by rememberSaveable { mutableStateOf(query) }
     val activeChanged: (Boolean) -> Unit = { active ->
         searchQuery = ""
@@ -339,6 +422,7 @@ fun EmbeddedSearchBar(
         }
     }
 }
+
 @Composable
 fun FloatingActionButtonWithAuth(
     route: String,

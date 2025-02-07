@@ -2,6 +2,7 @@ package com.openclassrooms.rebonnte.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.openclassrooms.rebonnte.model.Aisle
+import com.openclassrooms.rebonnte.model.Medicine
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -30,4 +31,14 @@ class AisleRepository @Inject constructor(
             .await()
         return !snapshot.isEmpty
     }
+
+    suspend fun getAislesFilteredByName(name: String): List<Aisle> {
+        val snapshot = firestore.collection("aisles")
+            .whereEqualTo("name", name)
+            .get()
+            .await()
+        return snapshot.toObjects(Aisle::class.java)
+    }
+
+
 }

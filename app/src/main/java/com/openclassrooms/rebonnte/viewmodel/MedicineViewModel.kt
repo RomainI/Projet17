@@ -82,27 +82,29 @@ class MedicineViewModel @Inject constructor(
 //        _medicines.value = currentMedicines
 //    }
 
-    fun filterByName(name: String) {
-        val currentMedicines: List<Medicine> = medicines.value
-        val filteredMedicines: MutableList<Medicine> = ArrayList()
-        for (medicine in currentMedicines) {
-            if (medicine.name.lowercase(Locale.getDefault())
-                    .contains(name.lowercase(Locale.getDefault()))
-            ) {
-                filteredMedicines.add(medicine)
-            }
-        }
-        _medicines.value = filteredMedicines
+    suspend fun filterByName(name: String) {
+//        val currentMedicines: List<Medicine> = medicines.value
+//        val filteredMedicines: MutableList<Medicine> = ArrayList()
+//        for (medicine in currentMedicines) {
+//            if (medicine.name.lowercase(Locale.getDefault())
+//                    .contains(name.lowercase(Locale.getDefault()))
+//            ) {
+//                filteredMedicines.add(medicine)
+//            }
+//        }
+//        _medicines.value = filteredMedicines
+
+        _medicines.value = repository.getMedicinesFilteredByName(name)
     }
 
-    fun sortByNone() {
-        _medicines.value = medicines.value.toMutableList() // Pas de tri
-    }
+//    fun sortByNone() {
+//        _medicines.value = medicines.value.toMutableList() // Pas de tri
+//    }
 
-    fun sortByName() {
-        val currentMedicines = ArrayList(medicines.value)
-        currentMedicines.sortWith(Comparator.comparing(Medicine::name))
-        _medicines.value = currentMedicines
+    suspend fun sortByName() {
+//        val currentMedicines = ArrayList(medicines.value)
+//        currentMedicines.sortWith(Comparator.comparing(Medicine::name))
+        _medicines.value = repository.getMedicinesSortedByName()
     }
 
     fun sortByStock() {

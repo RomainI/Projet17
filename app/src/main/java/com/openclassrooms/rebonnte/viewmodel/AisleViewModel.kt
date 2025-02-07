@@ -40,6 +40,11 @@ class AisleViewModel @Inject constructor(private val repository: AisleRepository
         }
     }
 
+    suspend fun filterByName(name: String) {
+
+        _aisles.value = repository.getAislesFilteredByName(name)
+    }
+
     fun addAisle(aisleName: String) {
         viewModelScope.launch {
             try {

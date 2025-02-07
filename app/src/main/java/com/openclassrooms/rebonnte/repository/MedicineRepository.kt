@@ -39,6 +39,14 @@ class MedicineRepository @Inject constructor(
         return snapshot.toObjects(Medicine::class.java)
     }
 
+    suspend fun getMedicinesSortedByName(): List<Medicine> {
+        val snapshot = firestore.collection("medicines")
+            .orderBy("name")
+            .get()
+            .await()
+        return snapshot.toObjects(Medicine::class.java)
+    }
+
     suspend fun updateMedicine(medicine: Medicine) {
         val medicineMap = mapOf(
             "name" to medicine.name,
