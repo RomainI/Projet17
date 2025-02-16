@@ -104,8 +104,6 @@ class MedicineViewModel @Inject constructor(
 //    }
 
     suspend fun sortByName() {
-//        val currentMedicines = ArrayList(medicines.value)
-//        currentMedicines.sortWith(Comparator.comparing(Medicine::name))
         _medicines.value = repository.getMedicinesSortedByName()
     }
 
