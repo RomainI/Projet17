@@ -1,5 +1,7 @@
 package com.openclassrooms.rebonnte.viewmodel
 
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openclassrooms.rebonnte.model.Medicine
@@ -157,6 +159,27 @@ class MedicineViewModel @Inject constructor(
             repository.updateMedicine(updatedMedicine)
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    fun uploadImage(imageUri: Uri, medicine: Medicine, onUploadSuccess: (String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val imageUrl = repository.uploadImageToFirestore(imageUri, medicine.id)
+
+                if (imageUrl.isNotEmpty()) {
+                    // Mise à jour locale de l’objet `Medicine`
+                    val updatedMedicine = medicine.copy(photoUrl = imageUrl)
+
+                    // Mettre à jour Firestore
+                    updateMedicineInDatabase(updatedMedicine)
+
+                    // Notifier l’UI
+                    onUploadSuccess(imageUrl)
+                }
+            } catch (e: Exception) {
+                Log.e("Upload", "Failed to upload image: ${e.message}")
+            }
         }
     }
 

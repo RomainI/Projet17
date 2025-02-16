@@ -1,15 +1,18 @@
 package com.openclassrooms.rebonnte.repository
 
+import android.net.Uri
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.openclassrooms.rebonnte.model.Medicine
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 import javax.inject.Inject
 
 class MedicineRepository @Inject constructor(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val storage: FirebaseStorage
+
 ) {
 
     suspend fun getAllMedicines(): List<Medicine> {
@@ -67,5 +70,28 @@ class MedicineRepository @Inject constructor(
             .document(medicine.id)
             .update(medicineMap)
             .await()
+    }
+
+    suspend fun uploadImageToFirestore(imageUri: Uri, medicineId: String): String {
+        return try {
+            val storageRef = storage.reference.child("medicine_images/${UUID.randomUUID()}.jpg")
+
+            // Upload du fichier
+            storageRef.putFile(imageUri).await()
+            val downloadUrl = storageRef.downloadUrl.await().toString()
+
+            // Mise à jour du champ photoUrl dans Firestore
+            firestore.collection("medicines")
+                .document(medicineId)
+                .update("photoUrl", downloadUrl)
+                .await()
+
+            Log.d("Firebase", "Image uploaded successfully and URL updated in Firestore: $downloadUrl")
+
+            return downloadUrl
+        } catch (e: Exception) {
+            Log.e("Firebase", "Image upload failed: ${e.message}")
+            ""
+        }
     }
 }

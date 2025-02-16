@@ -1,8 +1,11 @@
 package com.openclassrooms.rebonnte.viewmodel
 
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openclassrooms.rebonnte.model.Aisle
+import com.openclassrooms.rebonnte.model.Medicine
 import com.openclassrooms.rebonnte.repository.AisleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,6 +61,27 @@ class AisleViewModel @Inject constructor(private val repository: AisleRepository
             } catch (e: Exception) {
                 _aisleAddedStatus.value = Result.failure(e)
             }
+        }
+    }
+
+
+    fun uploadImage(imageUri: Uri, aisle: Aisle, onUploadSuccess: (String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val imageUrl = repository.uploadImageToFirestore(imageUri, aisle.id)
+
+                if (imageUrl.isNotEmpty()) {
+                    // Mise à jour locale et dans Firestore
+                    val updatedAisle = aisle.copy(mapUrl = imageUrl)
+                    repository.updateAisle(updatedAisle)
+
+                    // Notifier l’UI
+                    onUploadSuccess(imageUrl)
+                }
+            } catch (e: Exception) {
+                Log.e("Upload", "Failed to upload image: ${e.message}")
+            }
+            loadAisles()
         }
     }
 }

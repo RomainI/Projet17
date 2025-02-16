@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.openclassrooms.rebonnte"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -68,18 +68,29 @@ dependencies {
 
 
 
-    implementation(platform("com.google.firebase:firebase-bom:32.2.2"))
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
 
-    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation(libs.google.firebase.firestore.ktx)
 
-    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation(libs.google.firebase.auth.ktx)
 
-    implementation ("com.firebaseui:firebase-ui-auth:7.2.0")
+    implementation (libs.firebase.ui.auth)
 
-    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation(libs.firebase.analytics.ktx)
+
+//    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+//    implementation("com.google.firebase:firebase-analytics")
+    implementation(libs.firebase.firestore.ktx)
+//    implementation (libs.firebase.ui.auth)
+//    implementation(libs.firebase.ui.storage)
+//    implementation(libs.firebase.ui.firestore)
+//    implementation(libs.firebase.analytics)
+//    implementation(libs.firebase.messaging)
 
 
     implementation("com.google.dagger:hilt-android:2.48")
+    implementation(libs.firebase.storage.ktx)
+//    implementation(libs.firebase.storage.ktx)
     ksp("com.google.dagger:hilt-compiler:2.48")
 
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
@@ -87,4 +98,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
 }
