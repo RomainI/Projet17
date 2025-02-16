@@ -36,7 +36,8 @@ class MedicineRepository @Inject constructor(
 
     suspend fun getMedicinesFilteredByName(name: String): List<Medicine> {
         val snapshot = firestore.collection("medicines")
-            .whereEqualTo("name", name)
+            .whereGreaterThanOrEqualTo("name", name)
+            .whereLessThanOrEqualTo("name", name + '\uf8ff')
             .get()
             .await()
         return snapshot.toObjects(Medicine::class.java)

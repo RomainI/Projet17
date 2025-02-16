@@ -97,6 +97,7 @@ class MedicineViewModel @Inject constructor(
 //        _medicines.value = filteredMedicines
 
         _medicines.value = repository.getMedicinesFilteredByName(name)
+        _medicines.value.firstOrNull()?.let { Log.d("First search content", it.name) }
     }
 
 //    fun sortByNone() {
