@@ -22,6 +22,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
 import com.openclassrooms.rebonnte.R
 import com.openclassrooms.rebonnte.model.Medicine
@@ -65,7 +66,7 @@ fun MedicineItem(
             ) {
                 AsyncImage(
                     model = medicine.photoUrl ?: R.drawable.add_image,
-                    contentDescription = "Medicine image",
+                    contentDescription = stringResource(R.string.medicine_image),
                     modifier = Modifier
                         .size(64.dp)
                         .clip(RoundedCornerShape(8.dp)),
@@ -90,7 +91,7 @@ fun MedicineItem(
 
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowRight,
-                    contentDescription = "Arrow"
+                    contentDescription = stringResource(R.string.arrow_icon)
                 )
             }
         }

@@ -71,11 +71,9 @@ class AisleViewModel @Inject constructor(private val repository: AisleRepository
                 val imageUrl = repository.uploadImageToFirestore(imageUri, aisle.id)
 
                 if (imageUrl.isNotEmpty()) {
-                    // Mise à jour locale et dans Firestore
                     val updatedAisle = aisle.copy(mapUrl = imageUrl)
                     repository.updateAisle(updatedAisle)
 
-                    // Notifier l’UI
                     onUploadSuccess(imageUrl)
                 }
             } catch (e: Exception) {

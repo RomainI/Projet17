@@ -29,9 +29,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
+import com.openclassrooms.rebonnte.R
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -71,7 +73,7 @@ fun SwipeToDeleteItem(
     val revealedWidthDp = with(density) { revealedWidthPx.toDp() }
 
     val coroutineScope = rememberCoroutineScope()
-
+    val errorString = stringResource(R.string.you_must_be_connected)
     Box(modifier = modifier) {
         Box(
             modifier = Modifier
@@ -84,7 +86,7 @@ fun SwipeToDeleteItem(
                         if(isUserConnected) {
                             onDelete()
                         } else {
-                            Toast.makeText(context, "You must be connected to delete an item", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, errorString, Toast.LENGTH_SHORT).show()
                         }
                         swipeableState.snapTo(0)
                     }

@@ -11,10 +11,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.openclassrooms.rebonnte.R
 import com.openclassrooms.rebonnte.model.Medicine
 import com.openclassrooms.rebonnte.viewmodel.AisleViewModel
 import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
+
+private const val s = "Nom du médicament"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,7 +45,7 @@ fun AddMedicineScreen(
             TextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Nom du médicament") },
+                label = { Text(stringResource(R.string.medicine_name)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -54,7 +58,7 @@ fun AddMedicineScreen(
                     value = selectedAisle,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Choisir une allée") },
+                    label = { Text(stringResource(R.string.aisle_choose)) },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                     },
@@ -85,7 +89,7 @@ fun AddMedicineScreen(
                 onValueChange = {
                     stock = it.filter { char -> char.isDigit() }
                 },
-                label = { Text("Quantité initiale en stock") },
+                label = { Text(stringResource(R.string.initial_stock)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -93,11 +97,12 @@ fun AddMedicineScreen(
             if (error.isNotEmpty()) {
                 Text(text = error, color = androidx.compose.ui.graphics.Color.Red)
             }
+            val addMedicineString = stringResource(R.string.add_medicine)
 
             Button(
                 onClick = {
                     if (name.isBlank() || selectedAisle.isBlank() || stock.isBlank()) {
-                        error = "Tous les champs sont obligatoires"
+                        error = addMedicineString
                     } else {
                         viewModel.addMedicine(
                             Medicine(
@@ -112,7 +117,7 @@ fun AddMedicineScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Ajouter le médicament")
+                Text(text = stringResource(R.string.add_medicine))
             }
         }
     }

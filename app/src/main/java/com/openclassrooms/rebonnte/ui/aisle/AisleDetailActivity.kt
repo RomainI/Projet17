@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -35,16 +36,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import coil.compose.AsyncImage
 import com.openclassrooms.rebonnte.MainActivity
+import com.openclassrooms.rebonnte.R
 import com.openclassrooms.rebonnte.model.Medicine
 import com.openclassrooms.rebonnte.ui.medicine.MedicineDetailActivity
 import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
@@ -76,7 +80,12 @@ fun AisleDetailScreen(name: String, viewModel: MedicineViewModel, aisleViewModel
     val activity = context as Activity
     val aisles by aisleViewModel.aisles.collectAsState(initial = emptyList())
     val aisle = aisles.find { it.name == name }
-    var imageMapUrl by remember { mutableStateOf(aisle?.mapUrl ?: "https://img.leboncoin.fr/api/v1/lbcpb1/images/38/44/27/384427e9153618a1f642af772923916ce6e96743.jpg?rule=ad-image") }
+    var imageMapUrl by remember {
+        mutableStateOf(
+            aisle?.mapUrl
+                ?: "https://img.leboncoin.fr/api/v1/lbcpb1/images/38/44/27/384427e9153618a1f642af772923916ce6e96743.jpg?rule=ad-image"
+        )
+    }
 
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -91,7 +100,7 @@ fun AisleDetailScreen(name: String, viewModel: MedicineViewModel, aisleViewModel
     Scaffold(topBar = {
         TopAppBar(
             title = {
-                Text(text = "Aisle detail")
+                Text(text = stringResource(R.string.aisle_detail))
             },
             navigationIcon = {
                 IconButton(onClick = {
@@ -99,7 +108,7 @@ fun AisleDetailScreen(name: String, viewModel: MedicineViewModel, aisleViewModel
                 }) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "go back",
+                        contentDescription = stringResource(R.string.go_back),
                         tint = Color.Black
                     )
                 }
@@ -109,13 +118,13 @@ fun AisleDetailScreen(name: String, viewModel: MedicineViewModel, aisleViewModel
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-        ) {
+                .padding(paddingValues),
+            verticalArrangement = Arrangement.SpaceBetween
+            ) {
             LazyColumn(
-                contentPadding = paddingValues,
                 modifier = Modifier
-                    .weight(2f)
                     .fillMaxWidth()
+
             ) {
                 items(filteredMedicines) { medicine ->
                     MedicineItem(medicine = medicine, onClick = { name ->
@@ -126,28 +135,31 @@ fun AisleDetailScreen(name: String, viewModel: MedicineViewModel, aisleViewModel
                     })
                 }
             }
-
-            Text(
-                text = "Floor map, click on the image to update it",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 8.dp)
-            )
-
-
-            AsyncImage(
-
-                model = imageMapUrl,
-                contentDescription = "Uploaded Image",
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(8.dp)
-                    .fillMaxWidth()
-                    .clickable { launcher.launch("image/*") }
-                    .size(300.dp),
-
-
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.click_floor_image),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 8.dp)
                 )
+
+
+                AsyncImage(
+
+                    model = imageMapUrl,
+                    contentDescription = stringResource(R.string.uploaded_image),
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                        .clickable { launcher.launch("image/*") }
+                        .size(300.dp),
+
+
+                    )
+            }
         }
     }
 }
@@ -165,6 +177,6 @@ fun MedicineItem(medicine: Medicine, onClick: (String) -> Unit) {
             Text(text = medicine.name, fontWeight = FontWeight.Bold)
             Text(text = "Stock: ${medicine.stock}", color = Color.Gray)
         }
-        Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = "Arrow")
+        Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = stringResource(R.string.arrow_icon))
     }
 }

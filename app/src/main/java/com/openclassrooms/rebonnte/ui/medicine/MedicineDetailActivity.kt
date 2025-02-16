@@ -31,6 +31,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -72,7 +73,6 @@ fun MedicineDetailScreen(
 ) {
     val medicines by viewModel.medicines.collectAsState(initial = emptyList())
     val medicine = medicines.find { it.name == name } ?: return
-    val stock = medicine.stock
     val context = LocalContext.current
     val activity = context as Activity
     val aisles by aisleViewModel.aisles.collectAsState(initial = emptyList())
@@ -97,7 +97,7 @@ fun MedicineDetailScreen(
                     IconButton(onClick = { activity.finish() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Go back",
+                            contentDescription = stringResource(R.string.go_back),
                             tint = Color.Black
                         )
                     }
@@ -134,14 +134,14 @@ fun MedicineDetailScreen(
                         val medicinePhoto = if(medicine.photoUrl == null) R.drawable.add_image else medicine.photoUrl
                         AsyncImage(
                             model = medicinePhoto,
-                            contentDescription = "Medicine Image",
+                            contentDescription = stringResource(R.string.medicine_image),
                             modifier = Modifier
                                 .size(200.dp)
                                 .clip(RoundedCornerShape(16.dp))
                                 .clickable { launcher.launch("image/*")},
                             contentScale = ContentScale.Crop,
                         )
-                        val text = if(medicine.photoUrl == null) "Click here to add a photo" else medicine.name+" photo"
+                        val text = if(medicine.photoUrl == null) stringResource(R.string.click_here_medicine) else medicine.name+" photo"
                         Text(
                             text = text,
                             modifier = Modifier.padding(top = 4.dp)
@@ -154,7 +154,7 @@ fun MedicineDetailScreen(
                     ) {
                         AsyncImage(
                             model = aisle?.mapUrl,
-                            contentDescription = "Aisle Map",
+                            contentDescription = stringResource(R.string.aisle_map),
                             modifier = Modifier
                                 .size(200.dp)
                                 .clip(RoundedCornerShape(16.dp))
@@ -162,13 +162,12 @@ fun MedicineDetailScreen(
                             contentScale = ContentScale.Crop
                         )
                         Text(
-                            text = "Floor map",
+                            text = stringResource(R.string.floor_map),
                             modifier = Modifier.padding(top = 4.dp)
                         )
                     }
                 }
 
-                // Deuxième Row : stock et icônes flèches
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -181,7 +180,7 @@ fun MedicineDetailScreen(
                     ) {
                         val color = if (medicine.stock < 10) Color.Red else Color.Black
                         Text(
-                            text = "Stock left ${medicine.stock}",
+                            text = stringResource(R.string.stock_left)+" "+medicine.stock,
                             fontSize = 30.sp,
                             fontWeight = FontWeight.Bold,
                             color = color
@@ -195,7 +194,7 @@ fun MedicineDetailScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.KeyboardArrowUp,
-                            contentDescription = "Increase quantity",
+                            contentDescription = stringResource(R.string.increase),
                             modifier = Modifier.clickable {
                                 viewModel.incrementStock(
                                     medicine,
@@ -205,7 +204,7 @@ fun MedicineDetailScreen(
                         )
                         Icon(
                             imageVector = Icons.Filled.KeyboardArrowDown,
-                            contentDescription = "Decrease quantity",
+                            contentDescription = stringResource(R.string.decrease),
                             modifier = Modifier.clickable {
                                 viewModel.decrementStock(
                                     medicine,
@@ -225,7 +224,7 @@ fun MedicineDetailScreen(
                 Divider(color = Color.Black, thickness = 2.dp)
 
                 Text(
-                    text = "Modification history",
+                    text = stringResource(R.string.modification_history),
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -253,7 +252,7 @@ fun MedicineDetailScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Last modification by \n ${lastModified?.userEmail ?: "Unknown"} on ${formatDate(lastModified?.date)}",
+                        text =  stringResource(R.string.last_modification_by)+"\n ${lastModified?.userEmail ?: "Unknown"} on ${formatDate(lastModified?.date)}",
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )

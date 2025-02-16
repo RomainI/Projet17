@@ -1,3 +1,43 @@
 <resources>
     <string name="app_name">rebonnte</string>
+    <string name="add_new_aisle">Add New Aisle</string>
+    <string name="aisle_detail">Aisle detail</string>
+    <string name="go_back">go back</string>
+    <string name="click_floor_image">Floor map, click on the image to update it</string>
+    <string name="uploaded_image">Uploaded floor image</string>
+    <string name="arrow_icon">arrow icon</string>
+    <string name="welcome_user">Welcome authenticated user</string>
+    <string name="log_out">Log out</string>
+    <string name="delete_account">Delete account</string>
+    <string name="delete_success">Delete success</string>
+    <string name="delete_failed">Delete failed</string>
+    <string name="not_auth">You are not authenticated</string>
+    <string name="medicine_name">Medicine name</string>
+    <string name="aisle_choose">Choose an aisle</string>
+    <string name="initial_stock">Initial stock</string>
+    <string name="all_field_mandatory">All fields are mandatory</string>
+    <string name="add_medicine">Add medicine</string>
+    <string name="medicine_image">Medicine image</string>
+    <string name="click_here_medicine">Click here to add a medicine photo</string>
+    <string name="aisle_map">Aisle map</string>
+    <string name="floor_map">Floor map</string>
+    <string name="stock_left">Stock left</string>
+    <string name="increase">Increase quantity</string>
+    <string name="decrease">Decrease quantity</string>
+    <string name="modification_history">Modification history</string>
+    <string name="last_modification_by">Last modification by</string>
+    <string name="you_must_be_connected">You must be connected to delete an item</string>
+    <string name="aisle">Aisle</string>
+    <string name="medicine">Medicine</string>
+    <string name="manage_account">Manage account</string>
+    <string name="log_in">Log in</string>
+    <string name="sort_by_name">Sort by name</string>
+    <string name="sort_by_stock">Sort by stock</string>
+    <string name="search">Search</string>
+    <string name="add_button">Add button</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="aisle_name"> Aisle name</string>
+
+
 </resources>

@@ -40,7 +40,8 @@ class AisleRepository @Inject constructor(
 
     suspend fun getAislesFilteredByName(name: String): List<Aisle> {
         val snapshot = firestore.collection("aisles")
-            .whereEqualTo("name", name)
+            .whereGreaterThanOrEqualTo("name", name)
+            .whereLessThanOrEqualTo("name", name + '\uf8ff')
             .get()
             .await()
         return snapshot.toObjects(Aisle::class.java)

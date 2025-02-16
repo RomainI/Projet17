@@ -55,6 +55,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
@@ -118,98 +119,27 @@ fun MyApp(mainViewModel: MainViewModel) {
     val aisleViewModel: AisleViewModel = viewModel()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val route = navBackStackEntry?.destination?.route
-    val coroutine= rememberCoroutineScope()
 
     RebonnteTheme {
         Scaffold(
             topBar = {
-                var isSearchActive by rememberSaveable { mutableStateOf(false) }
-                var searchQuery by remember { mutableStateOf("") }
-
                 Column(verticalArrangement = Arrangement.spacedBy((-1).dp)) {
-//                    TopAppBar(
-//                        title = { if (route == "aisle") Text(text = "Aisle") else Text(text = "Medicines") },
-//                        actions = {
-//                            var expanded by remember { mutableStateOf(false) }
-//                            // if (currentRoute(navController) == "medicine") {
-//                            Row(
-//                                verticalAlignment = Alignment.CenterVertically,
-//                                modifier = Modifier
-//                                    .padding(end = 8.dp)
-//                                    .background(MaterialTheme.colorScheme.surface)
-//                                    .padding(horizontal = 8.dp, vertical = 4.dp)
-//                            ) {
-//                                Box {
-//                                    IconButton(onClick = { expanded = true }) {
-//                                        Icon(Icons.Default.MoreVert, contentDescription = null)
-//                                    }
-//                                    DropdownMenu(
-//                                        expanded = expanded,
-//                                        onDismissRequest = { expanded = false },
-//                                        offset = DpOffset(x = 0.dp, y = 0.dp)
-//                                    ) {
-////                                        DropdownMenuItem(
-////                                            onClick = {
-//                                        //TODO
-////                                                medicineViewModel.sortByNone()
-////                                                expanded = false
-////                                            },
-////                                            text = { Text("Sort by None") }
-////                                        )
-//                                        DropdownMenuItem(
-//                                            onClick = {
-//                                                coroutine.launch {
-//                                                    medicineViewModel.sortByName()
-//                                                }
-//                                                expanded = false
-//                                            },
-//                                            text = { Text("Sort by Name") }
-//                                        )
-//                                        DropdownMenuItem(
-//                                            onClick = {
-//                                                medicineViewModel.sortByStock()
-//                                                expanded = false
-//                                            },
-//                                            text = { Text("Sort by Stock") }
-//                                        )
-//                                    }
-//                                }
-//                            }
-//                            //}
-//                        }
-//                    )
-//                    if (currentRoute(navController) == "medicine") {
-//                        EmbeddedSearchBar(
-//                            query = searchQuery,
-//                            onQueryChange = {
-//                                coroutine.launch {
-//                                    medicineViewModel.filterByName(it)
-//                                }
-//                                searchQuery = it
-//                            },
-//                            isSearchActive = isSearchActive,
-//                            onActiveChanged = { isSearchActive = it }
-//                        )
-//                    }
                     if (route != null) {
                         TitleBar(route, medicineViewModel, aisleViewModel, navController)
                     }
-
-
                 }
-
             },
             bottomBar = {
                 NavigationBar {
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.Home, contentDescription = null) },
-                        label = { Text("Aisle") },
+                        label = { Text(stringResource(R.string.aisle)) },
                         selected = currentRoute(navController) == "aisle",
                         onClick = { navController.navigate("aisle") }
                     )
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.List, contentDescription = null) },
-                        label = { Text("Medicine") },
+                        label = { Text(stringResource(R.string.medicine)) },
                         selected = currentRoute(navController) == "medicine",
                         onClick = { navController.navigate("medicine") }
                     )
@@ -240,14 +170,19 @@ fun MyApp(mainViewModel: MainViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TitleBar(route: String, medicineViewModel: MedicineViewModel, aisleViewModel: AisleViewModel, navController: NavController) {
+fun TitleBar(
+    route: String,
+    medicineViewModel: MedicineViewModel,
+    aisleViewModel: AisleViewModel,
+    navController: NavController
+) {
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     val coroutine = rememberCoroutineScope()
     val activity = LocalContext.current as? Activity
     Column(verticalArrangement = Arrangement.spacedBy((-1).dp)) {
         TopAppBar(
-            title = { if (route == "aisle") Text(text = "Aisle") else Text(text = "Medicines") },
+            title = { if (route == "aisle") Text(text = "Aisle") else Text(text = stringResource(R.string.medicine) + "s") },
             actions = {
                 var expanded by remember { mutableStateOf(false) }
                 Row(
@@ -266,9 +201,10 @@ fun TitleBar(route: String, medicineViewModel: MedicineViewModel, aisleViewModel
                             onDismissRequest = { expanded = false },
                             offset = DpOffset(x = 0.dp, y = 0.dp)
                         ) {
+
                             DropdownMenuItem(
                                 onClick = {
-                                    if(FirebaseAuth.getInstance().currentUser!=null){
+                                    if (FirebaseAuth.getInstance().currentUser != null) {
                                         navController.navigate("manage_account")
                                     } else {
                                         if (activity != null) {
@@ -278,34 +214,35 @@ fun TitleBar(route: String, medicineViewModel: MedicineViewModel, aisleViewModel
                                     expanded = false
                                 },
                                 text = {
-                                    if(FirebaseAuth.getInstance().currentUser!=null){
-                                        Text("Manage account")
+                                    if (FirebaseAuth.getInstance().currentUser != null) {
+                                        Text(stringResource(R.string.manage_account))
                                     } else {
-                                        Text("Log in")
+                                        Text(stringResource(R.string.log_in))
                                     }
 
                                 }
                             )
-                            DropdownMenuItem(
-                                onClick = {
-                                    coroutine.launch {
-                                        medicineViewModel.sortByName()
-                                    }
-                                    expanded = false
-                                },
-                                text = { Text("Sort by Name") }
-                            )
-                            DropdownMenuItem(
-                                onClick = {
-                                    medicineViewModel.sortByStock()
-                                    expanded = false
-                                },
-                                text = { Text("Sort by Stock") }
-                            )
+                            if (route == "medicine") {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        coroutine.launch {
+                                            medicineViewModel.sortByName()
+                                        }
+                                        expanded = false
+                                    },
+                                    text = { Text(stringResource(R.string.sort_by_name)) }
+                                )
+                                DropdownMenuItem(
+                                    onClick = {
+                                        medicineViewModel.sortByStock()
+                                        expanded = false
+                                    },
+                                    text = { Text(stringResource(R.string.sort_by_stock)) }
+                                )
+                            }
                         }
                     }
                 }
-                //}
             }
         )
         if (route == "medicine") {
@@ -399,7 +336,7 @@ fun EmbeddedSearchBar(
             decorationBox = { innerTextField ->
                 if (searchQuery.isEmpty()) {
                     Text(
-                        text = "Search",
+                        text = stringResource(R.string.search),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
@@ -456,12 +393,10 @@ fun FloatingActionButtonWithAuth(
         } else {
             if (activity != null) {
                 startFirebaseUIAuth(activity)
-            } else {
-                Log.d("MainActivity", "Impossible de démarrer l'authentification")
             }
         }
     }) {
-        Icon(Icons.Default.Add, contentDescription = "Add")
+        Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_button))
     }
 }
 
@@ -481,20 +416,20 @@ fun AddAisleDialog(
                     onAddAisle(aisleName.trim())
                 }
             }) {
-                Text("Ajouter")
+                Text(stringResource(R.string.add))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Annuler")
+                Text(stringResource(R.string.cancel))
             }
         },
-        title = { Text("Ajouter une nouvelle allée") },
+        title = { Text(stringResource(R.string.add_new_aisle)) },
         text = {
             TextField(
                 value = aisleName,
                 onValueChange = { aisleName = it },
-                label = { Text("Nom de l'allée") }
+                label = { Text(stringResource(R.string.aisle_name)) }
             )
         }
     )

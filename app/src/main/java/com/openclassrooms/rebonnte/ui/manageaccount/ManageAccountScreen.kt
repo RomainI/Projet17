@@ -7,9 +7,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.openclassrooms.rebonnte.R
 import com.openclassrooms.rebonnte.viewmodel.ManageAccountViewModel
 
 @Composable
@@ -26,26 +28,26 @@ fun ManageAccountScreen(viewModel: ManageAccountViewModel = hiltViewModel()) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Bienvenue, utilisateur authentifié",
+                text = stringResource(R.string.welcome_user),
                 style = MaterialTheme.typography.headlineMedium
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
             Button(onClick = { viewModel.signOut() }) {
-                Text("Se déconnecter")
+                Text(stringResource(R.string.log_out))
             }
 
             Spacer(modifier = Modifier.height(10.dp))
 
             Button(onClick = { viewModel.deleteUserAccount() }) {
-                Text("Supprimer le compte")
+                Text(stringResource(R.string.delete_account))
             }
 
             deleteAccountResult?.let { result ->
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
-                    text = if (result) "Compte supprimé avec succès" else "Échec de la suppression",
+                    text = if (result) stringResource(R.string.delete_success) else stringResource(R.string.delete_failed),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -59,7 +61,7 @@ fun ManageAccountScreen(viewModel: ManageAccountViewModel = hiltViewModel()) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Vous n'êtes pas authentifié.",
+                text = stringResource(R.string.not_auth),
                 style = MaterialTheme.typography.headlineMedium
             )
         }
