@@ -23,4 +23,13 @@ class AuthRepository @Inject constructor(private val auth: FirebaseAuth) {
             false
         }
     }
+
+    fun getUserName(): String? {
+        val user = auth.currentUser
+        return try {
+            user?.displayName
+        } catch (e: Exception) {
+            null
+        }
+    }
 }

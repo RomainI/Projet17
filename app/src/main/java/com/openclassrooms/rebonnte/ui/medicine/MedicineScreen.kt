@@ -27,14 +27,13 @@ import coil.compose.AsyncImage
 import com.openclassrooms.rebonnte.R
 import com.openclassrooms.rebonnte.model.Medicine
 import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
-import kotlinx.coroutines.launch
 
 @Composable
-fun MedicineScreen(viewModel: MedicineViewModel = viewModel()) {
+fun MedicineScreen(viewModel: MedicineViewModel = viewModel(), isDarkMode: Boolean) {
     val medicines by viewModel.medicines.collectAsState(initial = emptyList())
     val context = LocalContext.current
-    if (medicines.isEmpty()){
-        Text (stringResource(R.string.empty_list))
+    if (medicines.isEmpty()) {
+        Text(stringResource(R.string.empty_list))
     } else {
         LazyColumn(
             modifier = Modifier.fillMaxSize()
@@ -42,7 +41,7 @@ fun MedicineScreen(viewModel: MedicineViewModel = viewModel()) {
             items(medicines) { medicine ->
                 MedicineItem(medicine = medicine, onClick = {
                     startDetailActivity(context, medicine.name)
-                }, medicineViewModel = viewModel)
+                }, medicineViewModel = viewModel, isDarkMode)
             }
         }
     }
@@ -52,7 +51,8 @@ fun MedicineScreen(viewModel: MedicineViewModel = viewModel()) {
 fun MedicineItem(
     medicine: Medicine,
     onClick: () -> Unit,
-    medicineViewModel: MedicineViewModel
+    medicineViewModel: MedicineViewModel,
+    isDarkMode: Boolean
 ) {
     SwipeToDeleteItem(
         onDelete = { medicineViewModel.deleteMedicine(medicine.id) },
@@ -67,8 +67,9 @@ fun MedicineItem(
                 verticalAlignment = Alignment.CenterVertically
 
             ) {
+                val model = if(! isDarkMode) medicine.photoUrl ?: R.drawable.add_image else medicine.photoUrl ?: R.drawable.add_image_invert
                 AsyncImage(
-                    model = medicine.photoUrl ?: R.drawable.add_image,
+                    model = model,
                     contentDescription = stringResource(R.string.medicine_image),
                     modifier = Modifier
                         .size(64.dp)

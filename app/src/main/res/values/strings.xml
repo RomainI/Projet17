@@ -7,6 +7,7 @@
     <string name="uploaded_image">Uploaded floor image</string>
     <string name="arrow_icon">arrow icon</string>
     <string name="welcome_user">Welcome authenticated user</string>
+    <string name="welcome">Welcome</string>
     <string name="log_out">Log out</string>
     <string name="delete_account">Delete account</string>
     <string name="delete_success">Delete success</string>

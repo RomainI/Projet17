@@ -98,7 +98,8 @@ class MainActivity : ComponentActivity() {
 
 
         setContent {
-            MyApp(mainViewModel)
+            var isDarkMode by remember { mutableStateOf(false) }
+            MyApp(isDarkMode, onThemeChangement = {isDarkMode = !isDarkMode})
         }
         broadcastReceiverManager.setOnBroadcastReceivedListener {
             medicineViewModel.refreshMedicines()
@@ -116,7 +117,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyApp(mainViewModel: MainViewModel) {
+fun MyApp(isDarkMode : Boolean, onThemeChangement : ()-> Unit) {
     val navController = rememberNavController()
     val medicineViewModel: MedicineViewModel = viewModel()
     val aisleViewModel: AisleViewModel = viewModel()
@@ -129,12 +130,12 @@ fun MyApp(mainViewModel: MainViewModel) {
         delay(2000)
         isLoading = false
     }
-    RebonnteTheme {
+    RebonnteTheme (darkTheme = isDarkMode){
         Scaffold(
             topBar = {
                 Column(verticalArrangement = Arrangement.spacedBy((-1).dp)) {
                     if (route != null) {
-                        TitleBar(route, medicineViewModel, aisleViewModel, navController)
+                        TitleBar(route, medicineViewModel, aisleViewModel, navController, onThemeChangement, isDarkMode)
                     }
                 }
             },
@@ -144,21 +145,21 @@ fun MyApp(mainViewModel: MainViewModel) {
                         icon = { Icon(Icons.Default.Home, contentDescription = null) },
                         label = { Text(stringResource(R.string.aisle)) },
                         selected = currentRoute(navController) == "aisle",
-                        onClick = { navController.navigate("aisle") }
+                        onClick = { if (!isLoading) navController.navigate("aisle") }
                     )
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.List, contentDescription = null) },
                         label = { Text(stringResource(R.string.medicine)) },
                         selected = currentRoute(navController) == "medicine",
-                        onClick = { navController.navigate("medicine") }
+                        onClick = { if (!isLoading) navController.navigate("medicine") }
                     )
                 }
             },
             floatingActionButton = {
                 FloatingActionButtonWithAuth(
                     route = route ?: "",
-                    medicineViewModel = medicineViewModel,
-                    aisleViewModel = aisleViewModel
+                    aisleViewModel = aisleViewModel,
+                    isDarkMode = isDarkMode
                 )
 
             }
@@ -182,7 +183,7 @@ fun MyApp(mainViewModel: MainViewModel) {
                         }
                         composable("medicine") {
                             if (isNetworkAvailable(LocalContext.current)) {
-                                MedicineScreen(medicineViewModel)
+                                MedicineScreen(medicineViewModel, isDarkMode)
                             } else {
                                 Text(stringResource(R.string.internet_unavailable))
                             }
@@ -207,7 +208,10 @@ fun TitleBar(
     route: String,
     medicineViewModel: MedicineViewModel,
     aisleViewModel: AisleViewModel,
-    navController: NavController
+    navController: NavController,
+    onThemeChangement : ()-> Unit,
+    isDarkMode: Boolean
+
 ) {
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -215,7 +219,7 @@ fun TitleBar(
     val activity = LocalContext.current as? Activity
     Column(verticalArrangement = Arrangement.spacedBy((-1).dp)) {
         TopAppBar(
-            title = { if (route == "aisle") Text(text = "Aisle") else Text(text = stringResource(R.string.medicine) + "s") },
+            title = { if (route == "aisle") Text(text = "Aisle") else if(route == "medicine") Text(text = stringResource(R.string.medicine) + "s") else Text(text = stringResource(R.string.manage_account) ) },
             actions = {
                 var expanded by remember { mutableStateOf(false) }
                 Row(
@@ -272,7 +276,16 @@ fun TitleBar(
                                     },
                                     text = { Text(stringResource(R.string.sort_by_stock)) }
                                 )
+
                             }
+                            DropdownMenuItem(
+                                onClick = {
+                                    onThemeChangement()
+                                },
+                                text = {
+                                    if (!isDarkMode) Text("Dark mode") else Text("Light mode")
+                                }
+                            )
                         }
                     }
                 }
@@ -290,7 +303,7 @@ fun TitleBar(
                 isSearchActive = isSearchActive,
                 onActiveChanged = { isSearchActive = it }
             )
-        } else {
+        } else if (route == "aisle"){
             EmbeddedSearchBar(
                 query = searchQuery,
                 onQueryChange = {
@@ -396,8 +409,8 @@ fun EmbeddedSearchBar(
 @Composable
 fun FloatingActionButtonWithAuth(
     route: String,
-    medicineViewModel: MedicineViewModel,
-    aisleViewModel: AisleViewModel
+    aisleViewModel: AisleViewModel,
+    isDarkMode: Boolean
 ) {
     val context = LocalContext.current
     val activity = LocalContext.current as? Activity
@@ -419,6 +432,7 @@ fun FloatingActionButtonWithAuth(
         if (currentUser != null) {
             if (route == "medicine") {
                 val intent = Intent(activity, AddMedicineActivity::class.java)
+                intent.putExtra("ISDARKMODE", isDarkMode)
                 context.startActivity(intent)
             } else if (route == "aisle") {
                 showAddAisleDialog = true

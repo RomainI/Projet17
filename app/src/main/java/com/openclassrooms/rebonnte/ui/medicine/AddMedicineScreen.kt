@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -42,7 +43,8 @@ import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
 fun AddMedicineScreen(
     viewModel: MedicineViewModel,
     aisleViewModel: AisleViewModel,
-    onMedicineAdded: () -> Unit
+    onMedicineAdded: () -> Unit,
+    isDarkMode : Boolean
 ) {
     var name by remember { mutableStateOf("") }
     var selectedAisle by remember { mutableStateOf("") }
@@ -71,10 +73,11 @@ fun AddMedicineScreen(
 
                         activity.finish()
                     }) {
+                        val tint = if(isDarkMode) Color.White else Color.Black
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.go_back),
-                            tint = Color.Black
+                            tint = tint
                         )
                     }
                 }
@@ -154,9 +157,9 @@ fun AddMedicineScreen(
 
 
             Spacer(modifier = Modifier.height(16.dp))
-
+            val model= if (isDarkMode) imageUri ?: R.drawable.add_image_invert else imageUri ?: R.drawable.add_image
             AsyncImage(
-                model = imageUri ?: R.drawable.add_image,
+                model = model,
                 contentDescription = stringResource(R.string.medicine_image),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -209,9 +212,9 @@ fun AddMedicineScreen(
                     }
                 }
             } else {
-
+                var barcodeModel = if(isDarkMode) R.drawable.barcode_invert else R.drawable.barcode
                 AsyncImage(
-                    model = R.drawable.barcode,
+                    model = barcodeModel,
                     contentDescription = stringResource(R.string.barcode_image),
                     modifier = Modifier
                         .fillMaxWidth()

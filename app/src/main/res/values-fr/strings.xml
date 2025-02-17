@@ -8,6 +8,7 @@
     <string name="uploaded_image">Image uploadee</string>
     <string name="arrow_icon">Icone fleche</string>
     <string name="welcome_user">Bienvenue, utilisateur authentifie</string>
+    <string name="welcome">Bienvenue</string>
     <string name="log_out">Se deconnecter</string>
     <string name="delete_account">Supprimer le compte</string>
     <string name="delete_success">Compte supprime avec succes</string>

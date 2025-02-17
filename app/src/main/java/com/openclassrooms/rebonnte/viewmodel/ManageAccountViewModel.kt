@@ -2,6 +2,7 @@ package com.openclassrooms.rebonnte.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.openclassrooms.rebonnte.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,11 @@ class ManageAccountViewModel @Inject constructor(private val authRepository: Aut
             authRepository.signOut()
             _isAuthenticated.value = false
         }
+    }
+
+    fun getAccountName() : String?{
+            return authRepository.getUserName()
+
     }
 
     fun deleteUserAccount() {

@@ -28,7 +28,7 @@ fun ManageAccountScreen(viewModel: ManageAccountViewModel = hiltViewModel()) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(R.string.welcome_user),
+                text = stringResource(R.string.welcome)+" "+viewModel.getAccountName(),
                 style = MaterialTheme.typography.headlineMedium
             )
 

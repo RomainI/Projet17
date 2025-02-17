@@ -17,15 +17,18 @@ class AddMedicineActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val medicineViewModel: MedicineViewModel by viewModels()
         val aisleViewModel: AisleViewModel by viewModels()
+        val isDarkMode = intent.getBooleanExtra("ISDARKMODE", false)
+
 
         setContent {
-            RebonnteTheme {
+            RebonnteTheme (darkTheme = isDarkMode){
                 AddMedicineScreen(
                     viewModel = medicineViewModel,
-                    aisleViewModel = aisleViewModel
-                ) {
-                    onBackPressedDispatcher.onBackPressed()
-                }
+                    aisleViewModel = aisleViewModel,
+                    isDarkMode = isDarkMode,
+                    onMedicineAdded = { onBackPressedDispatcher.onBackPressed() }
+
+                )
             }
         }
     }
