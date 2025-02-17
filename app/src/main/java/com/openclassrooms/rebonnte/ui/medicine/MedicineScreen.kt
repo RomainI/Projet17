@@ -33,14 +33,17 @@ import kotlinx.coroutines.launch
 fun MedicineScreen(viewModel: MedicineViewModel = viewModel()) {
     val medicines by viewModel.medicines.collectAsState(initial = emptyList())
     val context = LocalContext.current
-
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(medicines) { medicine ->
-            MedicineItem(medicine = medicine, onClick = {
-                startDetailActivity(context, medicine.name)
-            }, medicineViewModel = viewModel)
+    if (medicines.isEmpty()){
+        Text (stringResource(R.string.empty_list))
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(medicines) { medicine ->
+                MedicineItem(medicine = medicine, onClick = {
+                    startDetailActivity(context, medicine.name)
+                }, medicineViewModel = viewModel)
+            }
         }
     }
 }

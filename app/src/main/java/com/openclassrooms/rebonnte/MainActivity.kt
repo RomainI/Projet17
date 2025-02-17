@@ -5,7 +5,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import android.content.BroadcastReceiver
-import android.content.Context
+import com.openclassrooms.rebonnte.utils.isNetworkAvailable
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -38,6 +39,7 @@ import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -77,6 +79,7 @@ import com.openclassrooms.rebonnte.utils.AuthUtils.startFirebaseUIAuth
 import com.openclassrooms.rebonnte.utils.BroadcastReceiverManager
 import com.openclassrooms.rebonnte.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -119,7 +122,13 @@ fun MyApp(mainViewModel: MainViewModel) {
     val aisleViewModel: AisleViewModel = viewModel()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val route = navBackStackEntry?.destination?.route
+    var isLoading by remember { mutableStateOf(true) }
 
+    LaunchedEffect(Unit) {
+        isLoading = true
+        delay(2000)
+        isLoading = false
+    }
     RebonnteTheme {
         Scaffold(
             topBar = {
@@ -154,15 +163,39 @@ fun MyApp(mainViewModel: MainViewModel) {
 
             }
         ) {
-            NavHost(
-                modifier = Modifier.padding(it),
-                navController = navController,
-                startDestination = "aisle"
-            ) {
-                composable("aisle") { AisleScreen(aisleViewModel) }
-                composable("medicine") { MedicineScreen(medicineViewModel) }
-                composable("manage_account") { ManageAccountScreen() }
 
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                if (isLoading) {
+                    CircularProgressIndicator()
+                } else {
+                    NavHost(
+                        modifier = Modifier.padding(it),
+                        navController = navController,
+                        startDestination = "aisle"
+                    ) {
+                        composable("aisle") {
+                            if (isNetworkAvailable(LocalContext.current)) {
+                                AisleScreen(aisleViewModel)
+                            } else {
+                                Text(stringResource(R.string.internet_unavailable))
+                            }
+                        }
+                        composable("medicine") {
+                            if (isNetworkAvailable(LocalContext.current)) {
+                                MedicineScreen(medicineViewModel)
+                            } else {
+                                Text(stringResource(R.string.internet_unavailable))
+                            }
+                        }
+                        composable("manage_account") {
+                            if (isNetworkAvailable(LocalContext.current)) {
+                                ManageAccountScreen()
+                            } else {
+                                Text(stringResource(R.string.internet_unavailable))
+                            }
+                        }
+                    }
+                }
             }
         }
     }

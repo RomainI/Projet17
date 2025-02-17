@@ -30,14 +30,17 @@ import com.openclassrooms.rebonnte.viewmodel.AisleViewModel
 fun AisleScreen(viewModel: AisleViewModel) {
     val aisles by viewModel.aisles.collectAsState(initial = emptyList())
     val context = LocalContext.current
-
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(aisles) { aisle ->
-            AisleItem(aisle = aisle, onClick = {
-                startDetailActivity(context, aisle.name)
-            })
+    if (aisles.isEmpty()){
+        Text (stringResource(R.string.empty_list_aisle))
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(aisles) { aisle ->
+                AisleItem(aisle = aisle, onClick = {
+                    startDetailActivity(context, aisle.name)
+                })
+            }
         }
     }
 }

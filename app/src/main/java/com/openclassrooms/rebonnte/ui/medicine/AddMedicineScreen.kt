@@ -1,16 +1,24 @@
 package com.openclassrooms.rebonnte.ui.medicine
 
+import android.app.Activity
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.openclassrooms.rebonnte.R
@@ -18,24 +26,42 @@ import com.openclassrooms.rebonnte.model.Medicine
 import com.openclassrooms.rebonnte.viewmodel.AisleViewModel
 import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
 
-private const val s = "Nom du médicament"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddMedicineScreen(
     viewModel: MedicineViewModel,
     aisleViewModel: AisleViewModel,
-    onMedicineAdded: () -> Unit) {
+    onMedicineAdded: () -> Unit
+) {
     var name by remember { mutableStateOf("") }
     var selectedAisle by remember { mutableStateOf("") }
     var stock by remember { mutableStateOf("0") }
     var error by remember { mutableStateOf("") }
     val aisles by aisleViewModel.aisles.collectAsState()
-
+    val context = LocalContext.current
+    val activity = context as Activity
     var expanded by remember { mutableStateOf(false) }
 
     Scaffold(
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier.padding(4.dp),
+        topBar = {
+            TopAppBar(
+                title = { Text(text = stringResource(R.string.add_medicine)) },
+                navigationIcon = {
+                    IconButton(onClick = {
+
+                        activity.finish()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.go_back),
+                            tint = Color.Black
+                        )
+                    }
+                }
+            )
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -95,9 +121,9 @@ fun AddMedicineScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             if (error.isNotEmpty()) {
-                Text(text = error, color = androidx.compose.ui.graphics.Color.Red)
+                Text(text = error, color = Color.Red)
             }
-            val addMedicineString = stringResource(R.string.add_medicine)
+            val addMedicineString = stringResource(R.string.all_field_mandatory)
 
             Button(
                 onClick = {

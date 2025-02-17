@@ -38,6 +38,8 @@
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>
     <string name="aisle_name"> Aisle name</string>
-
+    <string name="empty_list"> There is no medicine</string>
+    <string name="empty_list_aisle"> There is no aisle</string>
+    <string name="internet_unavailable"> Internet unavailable</string>
 
 </resources>
