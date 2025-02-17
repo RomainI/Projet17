@@ -4,8 +4,15 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
+    id("org.sonarqube") version "6.0.1.5171"
 }
-
+sonar {
+    properties {
+        property("sonar.projectKey", "RomainI_Projet17")
+        property("sonar.organization", "romaini")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
+}
 android {
     namespace = "com.openclassrooms.rebonnte"
     compileSdk = 34
@@ -109,5 +116,16 @@ dependencies {
     implementation ("androidx.camera:camera-camera2:1.4.1")
     implementation ("androidx.camera:camera-lifecycle:1.4.1")
     implementation ("androidx.camera:camera-view:1.4.1")
+
+    // JUnit
+    testImplementation ("junit:junit:4.13.2")
+    testImplementation ("org.junit.jupiter:junit-jupiter:5.8.1")
+
+    // Coroutines Test
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
+
+    // MockK pour mocker les dépendances
+    testImplementation ("io.mockk:mockk:1.12.0")
+
 
 }

@@ -97,7 +97,7 @@ class MedicineViewModel @Inject constructor(
 //        _medicines.value = filteredMedicines
 
         _medicines.value = repository.getMedicinesFilteredByName(name)
-        _medicines.value.firstOrNull()?.let { Log.d("First search content", it.name) }
+//        _medicines.value.firstOrNull()?.let { Log.d("First search content", it.name) }
     }
 
 //    fun sortByNone() {
@@ -177,7 +177,7 @@ class MedicineViewModel @Inject constructor(
                     onUploadSuccess(imageUrl)
                 }
             } catch (e: Exception) {
-                Log.e("Upload", "Failed to upload image: ${e.message}")
+//                Log.e("Upload", "Failed to upload image: ${e.message}")
             }
         }
     }
