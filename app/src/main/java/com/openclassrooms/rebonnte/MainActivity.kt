@@ -55,6 +55,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -99,7 +100,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             var isDarkMode by remember { mutableStateOf(false) }
-            MyApp(isDarkMode, onThemeChangement = {isDarkMode = !isDarkMode})
+            MyApp(isDarkMode, onThemeChangement = { isDarkMode = !isDarkMode })
         }
         broadcastReceiverManager.setOnBroadcastReceivedListener {
             medicineViewModel.refreshMedicines()
@@ -117,7 +118,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyApp(isDarkMode : Boolean, onThemeChangement : ()-> Unit) {
+fun MyApp(isDarkMode: Boolean, onThemeChangement: () -> Unit) {
     val navController = rememberNavController()
     val medicineViewModel: MedicineViewModel = viewModel()
     val aisleViewModel: AisleViewModel = viewModel()
@@ -130,12 +131,19 @@ fun MyApp(isDarkMode : Boolean, onThemeChangement : ()-> Unit) {
         delay(2000)
         isLoading = false
     }
-    RebonnteTheme (darkTheme = isDarkMode){
+    RebonnteTheme(darkTheme = isDarkMode) {
         Scaffold(
             topBar = {
                 Column(verticalArrangement = Arrangement.spacedBy((-1).dp)) {
                     if (route != null) {
-                        TitleBar(route, medicineViewModel, aisleViewModel, navController, onThemeChangement, isDarkMode)
+                        TitleBar(
+                            route,
+                            medicineViewModel,
+                            aisleViewModel,
+                            navController,
+                            onThemeChangement,
+                            isDarkMode
+                        )
                     }
                 }
             },
@@ -162,10 +170,14 @@ fun MyApp(isDarkMode : Boolean, onThemeChangement : ()-> Unit) {
                     isDarkMode = isDarkMode
                 )
 
-            }
+            },
         ) {
 
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 if (isLoading) {
                     CircularProgressIndicator()
                 } else {
@@ -209,7 +221,7 @@ fun TitleBar(
     medicineViewModel: MedicineViewModel,
     aisleViewModel: AisleViewModel,
     navController: NavController,
-    onThemeChangement : ()-> Unit,
+    onThemeChangement: () -> Unit,
     isDarkMode: Boolean
 
 ) {
@@ -219,7 +231,11 @@ fun TitleBar(
     val activity = LocalContext.current as? Activity
     Column(verticalArrangement = Arrangement.spacedBy((-1).dp)) {
         TopAppBar(
-            title = { if (route == "aisle") Text(text = "Aisle") else if(route == "medicine") Text(text = stringResource(R.string.medicine) + "s") else Text(text = stringResource(R.string.manage_account) ) },
+            title = {
+                if (route == "aisle") Text(text = "Aisle") else if (route == "medicine") Text(
+                    text = stringResource(R.string.medicine) + "s"
+                ) else Text(text = stringResource(R.string.manage_account))
+            },
             actions = {
                 var expanded by remember { mutableStateOf(false) }
                 Row(
@@ -303,7 +319,7 @@ fun TitleBar(
                 isSearchActive = isSearchActive,
                 onActiveChanged = { isSearchActive = it }
             )
-        } else if (route == "aisle"){
+        } else if (route == "aisle") {
             EmbeddedSearchBar(
                 query = searchQuery,
                 onQueryChange = {
