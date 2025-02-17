@@ -1,3 +1,7 @@
+import com.android.build.gradle.BaseExtension
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -5,22 +9,53 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
     id("org.sonarqube") version "6.0.1.5171"
+    id("jacoco")
+
+    id("com.google.firebase.appdistribution")
 }
-sonar {
-    properties {
-        property("sonar.projectKey", "RomainI_Projet17")
-        property("sonar.organization", "romaini")
-        property("sonar.host.url", "https://sonarcloud.io")
+
+tasks.withType<Test> {
+    extensions.configure(JacocoTaskExtension::class) {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
     }
 }
+
+val keystorePropertiesFile = rootProject.file("app/keystore.properties")
+val keystoreProperties = Properties()
+
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
+//sonar {
+//    properties {
+//        property("sonar.projectKey", "RomainI_Projet17")
+//        property("sonar.organization", "romaini")
+//        property("sonar.host.url", "https://sonarcloud.io")
+//    }
+//}
 android {
     namespace = "com.openclassrooms.rebonnte"
     compileSdk = 34
 
+    signingConfigs {
+        create("release") {
+            if (keystoreProperties["storeFile"] != null) {
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+            }
+
+
+        }
+    }
     defaultConfig {
         applicationId = "com.openclassrooms.rebonnte"
         minSdk = 26
         targetSdk = 34
+
         versionCode = 1
         versionName = "1.0"
 
@@ -30,11 +65,18 @@ android {
 
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            firebaseAppDistribution {
+                serviceCredentialsFile = project.rootProject.file("app/firebase-adminsdk.json").toString()
+                appId ="1:11455656299:android:f8adb157aecd7cf2751c2e"
+                releaseNotes = "Release notes for full version"
+                testers = "romain.ilardi@gmail.com"
+            }
         }
     }
 
@@ -56,6 +98,55 @@ android {
     }
 
     packaging.resources.excludes.add("/META-INF/{AL2.0,LGPL2.1}")
+}
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+var SONAR_API_KEY : String
+if (localPropertiesFile.exists()) {
+    FileInputStream(localPropertiesFile).use { stream ->
+        localProperties.load(stream)
+    }
+    SONAR_API_KEY = localProperties["sonar.login"]?.toString().toString()
+} else {
+    SONAR_API_KEY =""
+}
+
+val androidExtension = extensions.getByType<BaseExtension>()
+
+val jacocoTestReport by tasks.registering(JacocoReport::class) {
+    dependsOn("testDebugUnitTest", "createDebugCoverageReport")
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports"
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val debugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug")
+    val mainSrc = androidExtension.sourceSets.getByName("main").java.srcDirs
+
+    classDirectories.setFrom(debugTree)
+    sourceDirectories.setFrom(files(mainSrc))
+    executionData.setFrom(fileTree(buildDir) {
+        include("**/*.exec", "**/*.ec")
+    })
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "RomainI_Projet17")
+        property("sonar.organization", "romaini")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.login", SONAR_API_KEY)
+
+        property("sonar.sources", "src/main/java")
+        property("sonar.tests", "src/test/java")
+        property("sonar.kotlin.detekt.reportPaths", "$buildDir/reports/detekt/detekt-report.xml") // Si vous utilisez Detekt
+        property("sonar.java.coveragePlugin", "jacoco")
+        property("sonar.coverage.jacoco.xmlReportPaths", "$buildDir/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.xml")
+    }
 }
 
 dependencies {
@@ -127,5 +218,8 @@ dependencies {
     // MockK pour mocker les dépendances
     testImplementation ("io.mockk:mockk:1.12.0")
 
+
+//    //distribution
+//    implementation("com.google.firebase:firebase-appdistribution:17.0.1")
 
 }

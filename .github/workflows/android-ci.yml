@@ -41,9 +41,37 @@ jobs:
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
 
+      - name: Decode Firebase Admin SDK
+        run: |
+          echo $FIREBASE_AUTH_TOKEN | base64 --decode > app/firebase-adminsdk.json
+        env:
+          FIREBASE_AUTH_TOKEN: ${{ secrets.FIREBASE_AUTH_TOKEN }}
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Set up Firebase CLI
+        run: |
+          export GOOGLE_APPLICATION_CREDENTIALS=app/firebase-adminsdk.json
+      - name: Verify Firebase Credentials File
+        run: ls -l app/firebase-adminsdk.json
+
+      - name: Debug GOOGLE_APPLICATION_CREDENTIALS
+        run: echo $GOOGLE_APPLICATION_CREDENTIALS
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: app/firebase-adminsdk.json
+
+
+
+      - name: Set File Permissions
+        run: chmod 600 app/firebase-adminsdk.json
+
       # Construire le projet avec Gradle
       - name: Build with Gradle
         run: ./gradlew assembleDebug
+
+      - name: Debug APK Paths
+        run: ls -R app/build/outputs/apk/
 
       # Exécuter les tests unitaires
       - name: Run Unit Tests
@@ -54,3 +82,12 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew sonar
+
+
+      - name: Display Firebase Admin SDK Content
+        run: cat app/firebase-adminsdk.json
+
+      - name: Upload APK to Firebase
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: app/firebase-adminsdk.json
+        run: ./gradlew appDistributionUploadDebug
