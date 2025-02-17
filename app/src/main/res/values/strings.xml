@@ -41,5 +41,8 @@
     <string name="empty_list"> There is no medicine</string>
     <string name="empty_list_aisle"> There is no aisle</string>
     <string name="internet_unavailable"> Internet unavailable</string>
+    <string name="or">OR</string>
+    <string name="barcode_image">barcode image</string>
+
 
 </resources>

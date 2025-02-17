@@ -42,5 +42,8 @@
     <string name="empty_list"> Il n y a pas de medicament cree</string>
     <string name="empty_list_aisle">Aucun élément disponible</string>
     <string name="internet_unavailable"> Internet non disponible</string>
+    <string name="or">OU</string>
+    <string name="barcode_image">Image de code barre </string>
+
 
 </resources>
