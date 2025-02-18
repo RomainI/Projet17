@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.openclassrooms.rebonnte.viewmodel.MainViewModel
 import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
 import javax.inject.Inject
@@ -32,12 +33,7 @@ class BroadcastReceiverManager @Inject constructor(
         val filter = IntentFilter().apply {
             addAction("com.rebonnte.ACTION_UPDATE")
         }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(broadcastReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
-        } else {
-            context.registerReceiver(broadcastReceiver, filter)
-        }
+        ContextCompat.registerReceiver(context, broadcastReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
     }
 
     fun stopReceiver() {
@@ -45,7 +41,9 @@ class BroadcastReceiverManager @Inject constructor(
     }
 
     fun sendBroadcast() {
-        val intent = Intent("com.rebonnte.ACTION_UPDATE")
+        val intent = Intent("com.rebonnte.ACTION_UPDATE").apply {
+            setPackage(context.packageName)
+        }
         context.sendBroadcast(intent)
     }
 }

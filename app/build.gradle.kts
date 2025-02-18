@@ -13,7 +13,6 @@ plugins {
     id("org.sonarqube")
     id("jacoco")
     id("com.google.firebase.appdistribution")
-    id("io.gitlab.arturbosch.detekt") version "1.23.1" // Ajout du plugin Detekt
 }
 
 tasks.withType<Test> {
@@ -92,9 +91,9 @@ android {
     packaging.resources.excludes.add("/META-INF/{AL2.0,LGPL2.1}")
 
     // Configuration de Lint pour générer un rapport XML à un emplacement spécifique
-    lint {
-        xmlOutput = file("$buildDir/reports/lint-results.xml")
-    }
+//    lint {
+//        xmlOutput = file("$buildDir/reports/lint-results.xml")
+//    }
 }
 
 val localProperties = Properties()
@@ -152,7 +151,7 @@ sonarqube {
         property("sonar.sources", "src/main/java")
         property("sonar.tests", "src/test/java")
         //  property("sonar.kotlin.detekt.reportPaths", "$buildDir/reports/detekt/detekt-report.xml") // Si vous utilisez Detekt
-        property("sonar.androidLint.reportPaths", "$buildDir/reports/lint-results.xml") // Utilisez le chemin configuré pour Lint
+        //property("sonar.androidLint.reportPaths", "$buildDir/reports/lint-results.xml") // Utilisez le chemin configuré pour Lint
 
     }
 }
@@ -202,4 +201,11 @@ dependencies {
 
     // MockK pour mocker les dépendances
     testImplementation("io.mockk:mockk:1.12.0")
+}
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.bouncycastle") {
+            useVersion("1.70")
+        }
+    }
 }
