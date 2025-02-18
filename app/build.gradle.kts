@@ -211,3 +211,8 @@ configurations.all {
         }
     }
 }
+tasks.whenTaskAdded {
+    if (name == "validateSigningDebug") {
+        enabled = false
+    }
+}
