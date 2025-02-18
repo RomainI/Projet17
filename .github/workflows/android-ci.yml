@@ -61,6 +61,17 @@ jobs:
         env:
           GOOGLE_APPLICATION_CREDENTIALS: app/firebase-adminsdk.json
 
+      - name: Generate debug keystore
+        run: |
+          mkdir -p ~/.config/.android
+          keytool -genkey -v -keystore ~/.config/.android/debug.keystore \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US" \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000
 
 
       - name: Set File Permissions
