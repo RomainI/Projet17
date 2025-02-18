@@ -201,6 +201,8 @@ dependencies {
 
     // MockK pour mocker les dépendances
     testImplementation("io.mockk:mockk:1.12.0")
+    implementation ("org.bouncycastle:bcprov-jdk15on:1.70")
+
 }
 configurations.all {
     resolutionStrategy.eachDependency {
