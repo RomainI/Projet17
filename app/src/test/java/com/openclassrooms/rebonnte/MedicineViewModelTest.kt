@@ -1,8 +1,9 @@
-package com.openclassrooms.rebonnte.viewmodel
+package com.openclassrooms.rebonnte
 
 import android.net.Uri
 import com.openclassrooms.rebonnte.model.Medicine
 import com.openclassrooms.rebonnte.repository.MedicineRepository
+import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
 import io.mockk.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
