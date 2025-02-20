@@ -77,7 +77,7 @@ import com.openclassrooms.rebonnte.ui.medicine.MedicineScreen
 import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
 import com.openclassrooms.rebonnte.ui.theme.RebonnteTheme
 import com.openclassrooms.rebonnte.utils.AuthUtils.startFirebaseUIAuth
-import com.openclassrooms.rebonnte.utils.BroadcastReceiverManager
+//import com.openclassrooms.rebonnte.utils.BroadcastReceiverManager
 import com.openclassrooms.rebonnte.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -85,12 +85,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
+/**
+ * Core package of the Rebonnte app, built with Jetpack Compose, MVVM, and Hilt for
+ * dependency injection
+ */
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject
-    lateinit var broadcastReceiverManager: BroadcastReceiverManager
-
-    val mainViewModel: MainViewModel by viewModels()
     val medicineViewModel: MedicineViewModel by viewModels()
 
 
@@ -102,11 +103,6 @@ class MainActivity : ComponentActivity() {
             var isDarkMode by remember { mutableStateOf(false) }
             MyApp(isDarkMode, onThemeChangement = { isDarkMode = !isDarkMode })
         }
-        broadcastReceiverManager.setOnBroadcastReceivedListener {
-            medicineViewModel.refreshMedicines()
-        }
-
-        mainViewModel.startBroadcastReceiver()
     }
 
     override fun onResume() {

@@ -31,6 +31,11 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
 
+
+/**
+* Composable used by AddMedicineScreen to open the video stream from the camera directly inside the screen
+ */
+
 @Composable
 fun CameraCaptureScreen(viewModel: MedicineViewModel) {
     val context = LocalContext.current

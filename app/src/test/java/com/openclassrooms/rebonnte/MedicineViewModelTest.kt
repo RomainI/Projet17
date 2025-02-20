@@ -33,16 +33,19 @@ class MedicineViewModelTest {
     }
 
     @Test
-    fun `loadMedicines should update state with repository data`() = runTest {
+    fun loadMedicinesUpdateTest() = runTest {
+        //Arrange
         val mockMedicines = listOf(
             Medicine("Paracetamol", 10, "A1", emptyList(), ""),
             Medicine("Ibuprofen", 333, "B2", emptyList(), "")
         )
         coEvery { repository.getAllMedicines() } returns mockMedicines
 
+        //Act
         viewModel.loadMedicines()
         advanceUntilIdle()
 
+        //Assert
         assertEquals(mockMedicines, viewModel.medicines.first())
     }
 
@@ -122,12 +125,10 @@ class MedicineViewModelTest {
     fun `incrementStock should increase stock count`() = runBlocking {
         val medicine = Medicine("Paracetamol", 10, "A1", emptyList(), "")
 
-        // S'assurer que la liste de médicaments contient l'élément avant de l'incrémenter
         viewModel._medicines.value = listOf(medicine)
 
         viewModel.incrementStock(medicine, "user@example.com")
 
-        // Vérifie que le stock a bien augmenté
         assertEquals(10, viewModel.medicines.first()[0].stock)
     }
 
@@ -149,7 +150,7 @@ class MedicineViewModelTest {
 
         coEvery { repository.uploadImageToFirestore(imageUri, any()) } returns "http://image-url.com"
 
-        viewModel.uploadImage(imageUri, medicine) { uploadedUrl ->
+        viewModel.updateMedicineImage(imageUri, medicine) { uploadedUrl ->
             assertEquals("http://image-url.com", uploadedUrl)
         }
         advanceUntilIdle()

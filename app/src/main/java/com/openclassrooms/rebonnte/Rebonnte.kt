@@ -12,7 +12,6 @@ class Rebonnte : Application(){
         super.onCreate()
         FirebaseApp.initializeApp(this)
 
-        // Activer la persistance hors ligne de Firestore
         val settings = FirebaseFirestoreSettings.Builder()
             .setPersistenceEnabled(true)
             .build()

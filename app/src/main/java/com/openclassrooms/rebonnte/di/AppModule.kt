@@ -7,7 +7,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.openclassrooms.rebonnte.repository.AisleRepository
 import com.openclassrooms.rebonnte.repository.AuthRepository
 import com.openclassrooms.rebonnte.repository.MedicineRepository
-import com.openclassrooms.rebonnte.utils.BroadcastReceiverManager
+//import com.openclassrooms.rebonnte.utils.BroadcastReceiverManager
 import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
 import dagger.Module
 import dagger.Provides
@@ -15,6 +15,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+
+/**
+ * Dependency Injection module, provides Firebase and repositories
+ * Mandatory for Hilt dependancy injection
+ */
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -43,11 +48,11 @@ object AppModule {
         return FirebaseStorage.getInstance()
     }
 
-    @Singleton
-    @Provides
-    fun provideBroadcastReceiverManager(@ApplicationContext context: Context): BroadcastReceiverManager {
-        return BroadcastReceiverManager(context)
-    }
+//    @Singleton
+//    @Provides
+//    fun provideBroadcastReceiverManager(@ApplicationContext context: Context): BroadcastReceiverManager {
+//        return BroadcastReceiverManager(context)
+//    }
 
 
     @Provides

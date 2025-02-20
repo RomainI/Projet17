@@ -18,6 +18,12 @@ import java.util.Locale
 import java.util.Random
 import javax.inject.Inject
 
+/**
+ * ViewModel for managing medicines used by medecine and aisles screens.
+ * Handles loading, adding, updating, and filtering medicines with StateFlow and Firebase.
+ */
+
+
 @HiltViewModel
 class MedicineViewModel @Inject constructor(
     private val repository: MedicineRepository
@@ -71,38 +77,12 @@ class MedicineViewModel @Inject constructor(
         loadMedicines()
     }
 
-//    fun addRandomMedicine(aisles: List<Aisle>) {
-//        val currentMedicines = ArrayList(medicines.value)
-//        currentMedicines.add(
-//            Medicine(
-//                "Medicine " + (currentMedicines.size + 1),
-//                Random().nextInt(100),
-//                aisles[Random().nextInt(aisles.size)].name,
-//                emptyList()
-//            )
-//        )
-//        _medicines.value = currentMedicines
-//    }
+
 
     suspend fun filterByName(name: String) {
-//        val currentMedicines: List<Medicine> = medicines.value
-//        val filteredMedicines: MutableList<Medicine> = ArrayList()
-//        for (medicine in currentMedicines) {
-//            if (medicine.name.lowercase(Locale.getDefault())
-//                    .contains(name.lowercase(Locale.getDefault()))
-//            ) {
-//                filteredMedicines.add(medicine)
-//            }
-//        }
-//        _medicines.value = filteredMedicines
-
         _medicines.value = repository.getMedicinesFilteredByName(name)
-//        _medicines.value.firstOrNull()?.let { Log.d("First search content", it.name) }
     }
 
-//    fun sortByNone() {
-//        _medicines.value = medicines.value.toMutableList() // Pas de tri
-//    }
 
     suspend fun sortByName() {
         _medicines.value = repository.getMedicinesSortedByName()
@@ -161,31 +141,40 @@ class MedicineViewModel @Inject constructor(
         }
     }
 
-    fun uploadImage(imageUri: Uri, medicine: Medicine, onUploadSuccess: (String) -> Unit) {
+    fun uploadImage(imageUri: Uri, onUploadSuccess: (String) -> Unit) {
         viewModelScope.launch {
             try {
-                val imageUrl = repository.uploadImageToFirestore(imageUri, medicine.id)
-
-                if (imageUrl.isNotEmpty()) {
-                    // Mise à jour locale de l’objet `Medicine`
-                    val updatedMedicine = medicine.copy(photoUrl = imageUrl)
-
-                    // Mettre à jour Firestore
-                    updateMedicineInDatabase(updatedMedicine)
-
-                    // Notifier l’UI
-                    onUploadSuccess(imageUrl)
-                }
+                val imageUrl = repository.uploadImageToFirestore(imageUri = imageUri)
+                onUploadSuccess(imageUrl)
             } catch (e: Exception) {
-//                Log.e("Upload", "Failed to upload image: ${e.message}")
+                Log.e("Upload", "Failed to upload image: ${e.message}")
             }
         }
     }
 
 
-//    private fun updateMedicine(updatedMedicine: Medicine) {
-//        val updatedList = _medicines.value.map { if (it.name == updatedMedicine.name) updatedMedicine else it }
-//        _medicines.value = updatedList.toMutableList()
-//    }
+    fun updateMedicineImage(
+        imageUri: Uri,
+        medicine: Medicine,
+        onUploadSuccess: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val imageUrl = repository.uploadImageToFirestore(imageUri, medicine.id)
+
+                if (imageUrl.isNotEmpty()) {
+                    val updatedMedicine = medicine.copy(photoUrl = imageUrl)
+
+                    updateMedicineInDatabase(updatedMedicine)
+
+                    onUploadSuccess(imageUrl)
+                }
+            } catch (e: Exception) {
+            }
+        }
+    }
+
+
+
 }
 

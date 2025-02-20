@@ -49,6 +49,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Activity and composable screen for displaying data about an unique medicine
+ * Supports image uploads, stock displaying and increment/decrement, and modification history inside a LazyRom
+ */
+
 @AndroidEntryPoint
 class MedicineDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,12 +83,14 @@ fun MedicineDetailScreen(
     val aisles by aisleViewModel.aisles.collectAsState(initial = emptyList())
     val aisle = aisles.find { it.name == medicine.nameAisle }
     var imageMedicineUrl by remember { mutableStateOf(medicine?.photoUrl) }
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let {
+                imageUri = it
                 if (aisle != null) {
-                    viewModel.uploadImage(it, medicine) { uploadedUrl ->
+                    viewModel.updateMedicineImage(it, medicine) { uploadedUrl ->
                         imageMedicineUrl = uploadedUrl
                     }
                 }
@@ -114,13 +121,11 @@ fun MedicineDetailScreen(
 
             Spacer(modifier = Modifier.height(50.dp))
 
-            // Conteneur du haut qui prendra 3/4 de la hauteur totale
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(3f)
             ) {
-                // Première Row : images Medicine & Floor map
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -131,17 +136,24 @@ fun MedicineDetailScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.weight(1f)
                     ) {
-                        val medicinePhoto = if(medicine.photoUrl == null) R.drawable.add_image else medicine.photoUrl
+                        val medicinePhoto =
+                            if (medicine.photoUrl == null) {
+                                if (imageUri == null) {
+                                    R.drawable.add_image
+                                } else imageUri
+                            } else medicine.photoUrl
+
                         AsyncImage(
                             model = medicinePhoto,
                             contentDescription = stringResource(R.string.medicine_image),
                             modifier = Modifier
                                 .size(200.dp)
                                 .clip(RoundedCornerShape(16.dp))
-                                .clickable { launcher.launch("image/*")},
+                                .clickable { launcher.launch("image/*") },
                             contentScale = ContentScale.Crop,
                         )
-                        val text = if(medicine.photoUrl == null) stringResource(R.string.click_here_medicine) else medicine.name+" photo"
+                        val text =
+                            if (medicine.photoUrl == null && imageUri == null) stringResource(R.string.click_here_medicine) else medicine.name + " photo"
                         Text(
                             text = text,
                             modifier = Modifier.padding(top = 4.dp)
@@ -180,7 +192,7 @@ fun MedicineDetailScreen(
                     ) {
                         val color = if (medicine.stock < 10) Color.Red else Color.Black
                         Text(
-                            text = stringResource(R.string.stock_left)+" "+medicine.stock,
+                            text = stringResource(R.string.stock_left) + " " + medicine.stock,
                             fontSize = 30.sp,
                             fontWeight = FontWeight.Bold,
                             color = color
@@ -252,7 +264,11 @@ fun MedicineDetailScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text =  stringResource(R.string.last_modification_by)+"\n ${lastModified?.userEmail ?: "Unknown"} on ${formatDate(lastModified?.date)}",
+                        text = stringResource(R.string.last_modification_by) + "\n ${lastModified?.userEmail ?: "Unknown"} on ${
+                            formatDate(
+                                lastModified?.date
+                            )
+                        }",
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )

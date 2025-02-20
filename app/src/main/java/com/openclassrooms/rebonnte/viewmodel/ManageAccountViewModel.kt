@@ -10,6 +10,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel for managing account used by manage account screen.
+ * Handles sign-in status, account deletion, and authentication status.
+ */
+
+
+
 @HiltViewModel
 class ManageAccountViewModel @Inject constructor(private val authRepository: AuthRepository) :
     ViewModel() {

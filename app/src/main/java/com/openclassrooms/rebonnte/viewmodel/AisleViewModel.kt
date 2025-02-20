@@ -13,6 +13,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel for managing aisles used by aisles and medicines screens.
+ * Handles loading, adding, updating, and filtering medicines with StateFlow and Firebase.
+ */
+
 @HiltViewModel
 class AisleViewModel @Inject constructor(private val repository: AisleRepository) : ViewModel() {
     var _aisles = MutableStateFlow<List<Aisle>>(emptyList())
@@ -24,13 +29,6 @@ class AisleViewModel @Inject constructor(private val repository: AisleRepository
     init {
         loadAisles()
     }
-
-//    fun addRandomAisle() {
-//        val currentAisles: MutableList<Aisle> = ArrayList(aisles.value)
-//        currentAisles.add(Aisle("Aisle " + (currentAisles.size + 1)))
-//        _aisles.value = currentAisles
-//    }
-
 
     private fun loadAisles() {
         viewModelScope.launch {

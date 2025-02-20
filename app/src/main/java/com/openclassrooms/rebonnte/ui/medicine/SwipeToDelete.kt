@@ -37,6 +37,10 @@ import com.openclassrooms.rebonnte.R
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
+/**
+ * Compose used to reproduce the swipe to delete usage
+ */
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SwipeToDeleteItem(
@@ -45,7 +49,7 @@ fun SwipeToDeleteItem(
     deleteIcon: @Composable () -> Unit = {
         Icon(
             imageVector = Icons.Default.Delete,
-            contentDescription = "Supprimer",
+            contentDescription = stringResource(R.string.delete_medicine),
             tint = Color.White,
             modifier = Modifier.size(40.dp)
         )

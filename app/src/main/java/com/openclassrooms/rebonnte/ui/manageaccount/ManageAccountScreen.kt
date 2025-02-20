@@ -14,6 +14,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.openclassrooms.rebonnte.R
 import com.openclassrooms.rebonnte.viewmodel.ManageAccountViewModel
 
+/**
+ * Composable screen for managing user accounts.
+ * Supports authentication status display, logout, and account deletion.
+ */
+
 @Composable
 fun ManageAccountScreen(viewModel: ManageAccountViewModel = hiltViewModel()) {
     val isAuthenticated by viewModel.isAuthenticated.collectAsState()

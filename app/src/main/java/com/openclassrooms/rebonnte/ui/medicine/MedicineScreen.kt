@@ -28,6 +28,11 @@ import com.openclassrooms.rebonnte.R
 import com.openclassrooms.rebonnte.model.Medicine
 import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
 
+/**
+ * Composable screen for displaying the list of medicines from MedicineViewModel
+ * Uses LazyColumn and swipe-to-delete
+ */
+
 @Composable
 fun MedicineScreen(viewModel: MedicineViewModel = viewModel(), isDarkMode: Boolean) {
     val medicines by viewModel.medicines.collectAsState(initial = emptyList())

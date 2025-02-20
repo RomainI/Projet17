@@ -10,6 +10,11 @@ import com.openclassrooms.rebonnte.viewmodel.AisleViewModel
 import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
+
+/**
+ * Activity for adding a new medicine launching AddMedicineScreen
+ */
+
 @AndroidEntryPoint
 class AddMedicineActivity : ComponentActivity() {
 

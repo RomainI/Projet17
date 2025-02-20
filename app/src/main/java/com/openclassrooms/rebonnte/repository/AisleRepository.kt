@@ -50,10 +50,9 @@ class AisleRepository @Inject constructor(
         try {
             firestore.collection("aisles")
                 .document(aisle.id)
-                .set(aisle, com.google.firebase.firestore.SetOptions.merge()) // Merge pour éviter d'écraser les données
+                .set(aisle, com.google.firebase.firestore.SetOptions.merge())
                 .await()
         } catch (e: Exception) {
-            Log.e("Firebase", "Failed to update Aisle: ${e.message}")
         }
     }
 
@@ -61,21 +60,17 @@ class AisleRepository @Inject constructor(
         return try {
             val storageRef = storage.reference.child("aisle_maps/${UUID.randomUUID()}.jpg")
 
-            // Upload du fichier
             storageRef.putFile(imageUri).await()
             val downloadUrl = storageRef.downloadUrl.await().toString()
 
-            // Mise à jour de Firestore AVEC merge (évite d’écraser d'autres champs)
             firestore.collection("aisles")
                 .document(aisleId)
                 .set(mapOf("mapUrl" to downloadUrl), com.google.firebase.firestore.SetOptions.merge())
                 .await()
 
-            Log.d("Firebase", "Image uploaded successfully and URL updated in Firestore: $downloadUrl")
 
             return downloadUrl
         } catch (e: Exception) {
-            Log.e("Firebase", "Image upload failed: ${e.message}")
             ""
         }
     }

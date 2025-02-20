@@ -37,6 +37,11 @@ import com.openclassrooms.rebonnte.model.Medicine
 import com.openclassrooms.rebonnte.viewmodel.AisleViewModel
 import com.openclassrooms.rebonnte.viewmodel.MedicineViewModel
 
+/**
+ * Composable screen for adding a new medicine.
+ * Supports image uploads, barcode scanning with CameraCaptureScreen, and aisle selection from existing aisles
+ */
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +49,7 @@ fun AddMedicineScreen(
     viewModel: MedicineViewModel,
     aisleViewModel: AisleViewModel,
     onMedicineAdded: () -> Unit,
-    isDarkMode : Boolean
+    isDarkMode: Boolean
 ) {
     var name by remember { mutableStateOf("") }
     var selectedAisle by remember { mutableStateOf("") }
@@ -56,10 +61,16 @@ fun AddMedicineScreen(
     var expanded by remember { mutableStateOf(false) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var imageUrl by remember { mutableStateOf<String?>(null) }
+    var isUploading by remember { mutableStateOf(false) }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
             imageUri = it
+            isUploading = true
+            viewModel.uploadImage(imageUri!!) { returnedUrl ->
+                imageUrl = returnedUrl
+                isUploading = false
+            }
         }
     }
 
@@ -73,7 +84,7 @@ fun AddMedicineScreen(
 
                         activity.finish()
                     }) {
-                        val tint = if(isDarkMode) Color.White else Color.Black
+                        val tint = if (isDarkMode) Color.White else Color.Black
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.go_back),
@@ -157,7 +168,8 @@ fun AddMedicineScreen(
 
 
             Spacer(modifier = Modifier.height(16.dp))
-            val model= if (isDarkMode) imageUri ?: R.drawable.add_image_invert else imageUri ?: R.drawable.add_image
+            val model = if (isDarkMode) imageUri ?: R.drawable.add_image_invert else imageUri
+                ?: R.drawable.add_image
             AsyncImage(
                 model = model,
                 contentDescription = stringResource(R.string.medicine_image),
@@ -212,7 +224,7 @@ fun AddMedicineScreen(
                     }
                 }
             } else {
-                var barcodeModel = if(isDarkMode) R.drawable.barcode_invert else R.drawable.barcode
+                val barcodeModel = if (isDarkMode) R.drawable.barcode_invert else R.drawable.barcode
                 AsyncImage(
                     model = barcodeModel,
                     contentDescription = stringResource(R.string.barcode_image),
@@ -224,10 +236,11 @@ fun AddMedicineScreen(
                 )
 
             }
-            var isButtonEnabled = name.isBlank() || selectedAisle.isBlank() || stock.isBlank()
+            val isButtonEnabled =
+                name.isNotBlank() && selectedAisle.isNotBlank() && stock.isNotBlank() && !isUploading
             Button(
                 onClick = {
-                    if (isButtonEnabled) {
+                    if (!isButtonEnabled) {
                         error = addMedicineString
                     } else {
                         val medicine = Medicine(
@@ -237,16 +250,8 @@ fun AddMedicineScreen(
                             histories = emptyList(),
                             photoUrl = imageUrl
                         )
-                        if (imageUri != null) {
-                            viewModel.uploadImage(imageUri!!, medicine) { uploadedUrl ->
-                                imageUrl = uploadedUrl
-                                viewModel.addMedicine(medicine.copy(photoUrl = uploadedUrl))
-                                onMedicineAdded()
-                            }
-                        } else {
-                            viewModel.addMedicine(medicine)
-                            onMedicineAdded()
-                        }
+                        viewModel.addMedicine(medicine)
+                        onMedicineAdded()
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),

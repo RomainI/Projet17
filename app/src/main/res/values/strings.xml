@@ -44,6 +44,7 @@
     <string name="internet_unavailable"> Internet unavailable</string>
     <string name="or">OR</string>
     <string name="barcode_image">barcode image</string>
+    <string name="delete_medicine">Delete medicine action</string>
 
 
 </resources>

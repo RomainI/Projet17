@@ -56,6 +56,11 @@ import com.openclassrooms.rebonnte.ui.theme.RebonnteTheme
 import com.openclassrooms.rebonnte.viewmodel.AisleViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * Activity and composable screen for displaying data about an unique aisle
+ * Supports image upload and list medicines attached to the aisle
+ */
+
 @AndroidEntryPoint
 class AisleDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

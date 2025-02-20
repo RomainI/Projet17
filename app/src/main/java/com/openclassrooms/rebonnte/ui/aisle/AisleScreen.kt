@@ -26,6 +26,11 @@ import com.openclassrooms.rebonnte.R
 import com.openclassrooms.rebonnte.model.Aisle
 import com.openclassrooms.rebonnte.viewmodel.AisleViewModel
 
+/**
+ * Composable screen for displaying the list of aisles from AisleViewModel
+ * Uses LazyColumn
+ */
+
 @Composable
 fun AisleScreen(viewModel: AisleViewModel) {
     val aisles by viewModel.aisles.collectAsState(initial = emptyList())

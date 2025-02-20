@@ -45,6 +45,7 @@
     <string name="internet_unavailable"> Internet non disponible</string>
     <string name="or">OU</string>
     <string name="barcode_image">Image de code barre </string>
+    <string name="delete_medicine">Action de suppression du medicament</string>
 
 
 </resources>

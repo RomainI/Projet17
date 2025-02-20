@@ -9,6 +9,12 @@ import kotlinx.coroutines.tasks.await
 import java.util.UUID
 import javax.inject.Inject
 
+/**
+ * Repository for managing medicine data in Firestore and Firebase Storage.
+ * Used to upload images, adding, updating deleting filtering/sorting medicine with Firebase.
+ */
+
+
 class MedicineRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val storage: FirebaseStorage
@@ -73,21 +79,45 @@ class MedicineRepository @Inject constructor(
             .await()
     }
 
+    suspend fun uploadImageToFirestore(imageUri: Uri): String {
+        return try {
+            val storageRef = storage.reference.child("medicine_images/${UUID.randomUUID()}.jpg")
+
+            storageRef.putFile(imageUri).await()
+            val downloadUrl = storageRef.downloadUrl.await().toString()
+            return downloadUrl
+        } catch (e: Exception) {
+            Log.e("Firebase", "Image upload failed: ${e.message}")
+            ""
+        }
+    }
+
+    suspend fun uploadMedicineImageToFirestore(imageUrl: String, medicineId: String) {
+        try {
+            firestore.collection("medicines")
+                .document(medicineId)
+                .update("photoUrl", imageUrl)
+                .await()
+        } catch (e: Exception) {
+            Log.e("Firebase", "Update image failed: ${e.message}")
+        }
+    }
+
     suspend fun uploadImageToFirestore(imageUri: Uri, medicineId: String): String {
         return try {
             val storageRef = storage.reference.child("medicine_images/${UUID.randomUUID()}.jpg")
 
-            // Upload du fichier
             storageRef.putFile(imageUri).await()
             val downloadUrl = storageRef.downloadUrl.await().toString()
-
-            // Mise à jour du champ photoUrl dans Firestore
             firestore.collection("medicines")
                 .document(medicineId)
                 .update("photoUrl", downloadUrl)
                 .await()
 
-            Log.d("Firebase", "Image uploaded successfully and URL updated in Firestore: $downloadUrl")
+            Log.d(
+                "Firebase",
+                "Image uploaded successfully and URL updated in Firestore: $downloadUrl"
+            )
 
             return downloadUrl
         } catch (e: Exception) {

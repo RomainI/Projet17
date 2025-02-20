@@ -6,6 +6,11 @@ import android.content.Intent
 import com.firebase.ui.auth.AuthUI
 import com.openclassrooms.rebonnte.R
 
+/**
+ * Util object for authentication using FirebaseUI.
+ * Handles user sign-in with email authentication ("provider")
+ */
+
 object AuthUtils {
     private const val SIGN_IN_REQUEST_CODE = 1234
 
