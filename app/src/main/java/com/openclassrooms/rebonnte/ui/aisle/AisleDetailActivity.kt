@@ -66,11 +66,12 @@ class AisleDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val name = intent.getStringExtra("nameAisle") ?: "Unknown"
+        val isDarkMode = intent.getBooleanExtra("isDarkMode", false )
         val viewModel: MedicineViewModel by viewModels()
         val aisleViewModel: AisleViewModel by viewModels()
         setContent {
-            RebonnteTheme {
-                AisleDetailScreen(name, viewModel, aisleViewModel)
+            RebonnteTheme (darkTheme = isDarkMode){
+                AisleDetailScreen(name, viewModel, aisleViewModel, isDarkMode)
             }
         }
     }
@@ -78,12 +79,13 @@ class AisleDetailActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AisleDetailScreen(name: String, viewModel: MedicineViewModel, aisleViewModel: AisleViewModel) {
+fun AisleDetailScreen(name: String, viewModel: MedicineViewModel, aisleViewModel: AisleViewModel, isDarkMode : Boolean) {
     val medicines by viewModel.medicines.collectAsState(initial = emptyList())
     val filteredMedicines = medicines.filter { it.nameAisle == name }
     val context = LocalContext.current
     val activity = context as Activity
     val aisles by aisleViewModel.aisles.collectAsState(initial = emptyList())
+    val tint = if (isDarkMode) Color.White else Color.Black
     val aisle = aisles.find { it.name == name }
     var imageMapUrl by remember {
         mutableStateOf(
@@ -114,7 +116,7 @@ fun AisleDetailScreen(name: String, viewModel: MedicineViewModel, aisleViewModel
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.go_back),
-                        tint = Color.Black
+                        tint = tint
                     )
                 }
             }

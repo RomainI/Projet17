@@ -32,7 +32,7 @@ import com.openclassrooms.rebonnte.viewmodel.AisleViewModel
  */
 
 @Composable
-fun AisleScreen(viewModel: AisleViewModel) {
+fun AisleScreen(viewModel: AisleViewModel, isDarkMode: Boolean) {
     val aisles by viewModel.aisles.collectAsState(initial = emptyList())
     val context = LocalContext.current
     if (aisles.isEmpty()){
@@ -43,7 +43,7 @@ fun AisleScreen(viewModel: AisleViewModel) {
         ) {
             items(aisles) { aisle ->
                 AisleItem(aisle = aisle, onClick = {
-                    startDetailActivity(context, aisle.name)
+                    startDetailActivity(context, aisle.name, isDarkMode = isDarkMode )
                 })
             }
         }
@@ -64,9 +64,10 @@ fun AisleItem(aisle: Aisle, onClick: () -> Unit) {
     }
 }
 
-private fun startDetailActivity(context: Context, name: String) {
+private fun startDetailActivity(context: Context, name: String , isDarkMode : Boolean) {
     val intent = Intent(context, AisleDetailActivity::class.java).apply {
         putExtra("nameAisle", name)
+        putExtra("isDarkMode", isDarkMode)
     }
     context.startActivity(intent)
 }

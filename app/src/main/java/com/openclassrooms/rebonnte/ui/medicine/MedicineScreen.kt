@@ -45,7 +45,7 @@ fun MedicineScreen(viewModel: MedicineViewModel = viewModel(), isDarkMode: Boole
         ) {
             items(medicines) { medicine ->
                 MedicineItem(medicine = medicine, onClick = {
-                    startDetailActivity(context, medicine.name)
+                    startDetailActivity(context, medicine.name, isDarkMode)
                 }, medicineViewModel = viewModel, isDarkMode)
             }
         }
@@ -107,9 +107,10 @@ fun MedicineItem(
     )
 }
 
-private fun startDetailActivity(context: Context, name: String) {
+private fun startDetailActivity(context: Context, name: String, isDarkMode: Boolean) {
     val intent = Intent(context, MedicineDetailActivity::class.java).apply {
         putExtra("nameMedicine", name)
+        putExtra("isDarkMode", isDarkMode)
     }
     context.startActivity(intent)
 }

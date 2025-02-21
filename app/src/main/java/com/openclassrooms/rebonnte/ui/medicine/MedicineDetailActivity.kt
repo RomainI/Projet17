@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -59,13 +60,15 @@ class MedicineDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val name = intent.getStringExtra("nameMedicine") ?: "Unknown"
+        val isDarkMode = intent.getBooleanExtra("isDarkMode", false)
+
         val viewModel: MedicineViewModel by viewModels()
         val aisleViewModel: AisleViewModel by viewModels()
 
 
         setContent {
-            RebonnteTheme {
-                MedicineDetailScreen(name, viewModel, aisleViewModel)
+            RebonnteTheme (isDarkMode) {
+                MedicineDetailScreen(name, viewModel, aisleViewModel, isDarkMode)
             }
         }
     }
@@ -74,7 +77,7 @@ class MedicineDetailActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MedicineDetailScreen(
-    name: String, viewModel: MedicineViewModel, aisleViewModel: AisleViewModel
+    name: String, viewModel: MedicineViewModel, aisleViewModel: AisleViewModel, isDarkMode : Boolean
 ) {
     val medicines by viewModel.medicines.collectAsState(initial = emptyList())
     val medicine = medicines.find { it.name == name } ?: return
@@ -84,6 +87,9 @@ fun MedicineDetailScreen(
     val aisle = aisles.find { it.name == medicine.nameAisle }
     var imageMedicineUrl by remember { mutableStateOf(medicine?.photoUrl) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val tint = if (isDarkMode) Color.White else Color.Black
+
+
 
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -105,7 +111,7 @@ fun MedicineDetailScreen(
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.go_back),
-                            tint = Color.Black
+                            tint = tint
                         )
                     }
                 }
@@ -139,7 +145,7 @@ fun MedicineDetailScreen(
                         val medicinePhoto =
                             if (medicine.photoUrl == null) {
                                 if (imageUri == null) {
-                                    R.drawable.add_image
+                                    if(isDarkMode) R.drawable.add_image_invert else R.drawable.add_image
                                 } else imageUri
                             } else medicine.photoUrl
 
@@ -190,7 +196,7 @@ fun MedicineDetailScreen(
                         modifier = Modifier.weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
-                        val color = if (medicine.stock < 10) Color.Red else Color.Black
+                        val color = if (medicine.stock < 10) Color.Red else tint
                         Text(
                             text = stringResource(R.string.stock_left) + " " + medicine.stock,
                             fontSize = 30.sp,
@@ -212,7 +218,8 @@ fun MedicineDetailScreen(
                                     medicine,
                                     FirebaseAuth.getInstance().currentUser?.email
                                 )
-                            }
+                            },
+                            tint= tint
                         )
                         Icon(
                             imageVector = Icons.Filled.KeyboardArrowDown,
@@ -222,7 +229,8 @@ fun MedicineDetailScreen(
                                     medicine,
                                     FirebaseAuth.getInstance().currentUser?.email
                                 )
-                            }
+                            },
+                            tint= tint
                         )
                     }
                 }

@@ -184,7 +184,7 @@ fun MyApp(isDarkMode: Boolean, onThemeChangement: () -> Unit) {
                     ) {
                         composable("aisle") {
                             if (isNetworkAvailable(LocalContext.current)) {
-                                AisleScreen(aisleViewModel)
+                                AisleScreen(aisleViewModel, isDarkMode)
                             } else {
                                 Text(stringResource(R.string.internet_unavailable))
                             }
